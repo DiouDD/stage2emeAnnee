@@ -1,0 +1,123 @@
+<nb-card>
+    <nb-card-body>
+        <div class="row mb-4 align-items-center">
+            <div class="col-md-1">
+                <label class="label">Nom</label>
+            </div>
+            <div class="col-md-5">
+                <nb-select 
+                    [(ngModel)]="selectedProfile"
+                    (selectedChange)="onProfileChange($event?.profile)"
+                    [compareWith]="compareFn">
+                    <nb-option *ngFor="let profile of profiles" [value]="profile">
+                        {{ profile.profile }}
+                    </nb-option>
+                </nb-select>
+            </div>
+        </div>
+        <div class="row" *ngIf="newSelectedProfile">
+            <div class="col-md-6">
+                <div class="row align-items-center mb-3">
+                    <label class="label col-sm-3">1. Message d'acceuil</label>
+                    <div class="col-sm-9">
+                        <nb-select 
+                            [(ngModel)]="newSelectedProfile.audio_welcome"
+                            (selectedChange)="onAudioWelcomeChange($event)">
+                            <nb-option [value]="null">Aucun</nb-option>
+                            <nb-option *ngFor="let audio of audioOptions" [value]="audio"> 
+                                {{ audio | aucun }}
+                            </nb-option>
+                        </nb-select>
+                    </div>
+                </div>
+                <div class="row align-items-center mb-4">
+                    <label class="label col-sm-4">2. Le temps limite de la file d'attente</label>
+                    <div class="col-sm-3">
+                        <input type="number" nbInput fullWidth [(ngModel)]="newSelectedProfile.waiting_time">
+                    </div>
+                </div>
+                <ngx-orange-avi-times [selectedProfileId]="selectedProfileId"></ngx-orange-avi-times>
+            </div>
+            <!-- Colonne de droite (Messages audio) -->
+            <div class="col-md-5 offset-md-1">
+                <div class="form-group mb-4">
+                  <label class="label">Barrage entrant</label>
+                  <nb-select fullWidth
+                          [(ngModel)]="newSelectedProfile.barrage_entrant"
+                          (selectedChange)="onBarrageChange($event)">
+                          <nb-option [value]="null">Aucun</nb-option>
+                          <nb-option *ngFor="let audio of audioOptions" [value]="audio">
+                              {{ audio | aucun }}
+                          </nb-option>
+                  </nb-select>
+              </div>
+                <div class="form-group mb-4">
+                    <label class="label">3. Message d attente</label>
+                    <nb-select fullWidth selected="attente"
+                            [(ngModel)]="newSelectedProfile.audio_waiting"
+                            (selectedChange)="onAudioWaitingChange($event)">
+                            <nb-option [value]="null">Aucun</nb-option>
+                            <nb-option *ngFor="let audio of audioOptions" [value]="audio"> 
+                                {{ audio | aucun }}
+                            </nb-option>
+                    </nb-select>
+                </div>
+                <div class="form-group mb-4">
+                    <label class="label">4. Message de dissuasion ( si rien de renseigner, raccrochage auto )</label>
+                    <nb-select fullWidth selected="dissuasion"
+                            [(ngModel)]="newSelectedProfile.audio_dissuasion"
+                            (selectedChange)="onAudioDissuasionChange($event)">
+                            <nb-option [value]="null">Aucun</nb-option>
+                            <nb-option *ngFor="let audio of audioOptions" [value]="audio"> 
+                                {{ audio | aucun }}
+                            </nb-option>
+                    </nb-select>
+                </div>
+                <div class="form-group mb-4">
+                    <label class="label">5. Message de Fermeture</label>
+                    <nb-select fullWidth selected="fermeture"
+                            [(ngModel)]="newSelectedProfile.audio_closing"
+                            (selectedChange)="onAudioClosingChange($event)">
+                            <nb-option [value]="null">Aucun</nb-option>
+                            <nb-option *ngFor="let audio of audioOptions" [value]="audio"> 
+                                {{ audio | aucun }}
+                            </nb-option>
+                    </nb-select>
+                </div>
+                <div class="form-group mb-4">
+                    <label class="label">6. Message de Fermeture Exceptionnelle</label>
+                    <nb-select fullWidth selected="fermeture exceptionnelle"
+                            [(ngModel)]="newSelectedProfile.audio_exceptionnel"
+                            (selectedChange)="onAudioExceptChange($event)">
+                            <nb-option [value]="null">Aucun</nb-option>
+                            <nb-option *ngFor="let audio of audioOptions" [value]="audio"> 
+                                {{ audio | aucun }}
+                            </nb-option>
+                    </nb-select>
+                </div>
+                <div class="form-group mb-5">
+                    <label class="label">7. Message Flash</label>
+                     <nb-select fullWidth selected="aucun"
+                            [(ngModel)]="newSelectedProfile.audio_flash"
+                            (selectedChange)="onAudioFlashChange($event)">
+                            <nb-option [value]="null">Aucun</nb-option>
+                            <nb-option *ngFor="let audio of audioOptions" [value]="audio"> 
+                                {{ audio | aucun }}
+                            </nb-option>
+                    </nb-select>
+                </div>
+                <div class="row mt-5">
+                    <div class="col text-right">
+                        <button *ngIf="isEditing" nbButton outline status="primary">
+                            Annuler les modifications
+                        </button>
+                        <button *ngIf="isEditing" nbButton outline status="warning">
+                            Enregistrer les modifications
+                        </button>
+                        <button nbButton outline status="danger">Supprimer le profil</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nb-card-body>
+</nb-card>

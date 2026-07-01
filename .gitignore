@@ -1,0 +1,40 @@
+# Ignore les dossiers de dépendances partout dans le projet
+**/node_modules/
+
+# Ignore les builds NestJS et Angular partout
+**/dist/
+**/.angular/
+
+# Ignore les variables d'environnement locales si tu en as
+**/.env
+
+
+# Cache des outils de build et logs
+.npm
+/.pnpm-debug.log*
+yarn-error.log*
+.pnpm-store.yaml
+
+# IDEs et éditeurs de texte
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Tests et couverture de code
+/coverage
+.nyc_output
+
+# Variables d'environnement locales (sécurité)
+.env
+.env.local

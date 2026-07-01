@@ -1,0 +1,16 @@
+<nb-card>
+    <nb-card-body>
+        <nb-tabset fullWidth (changeTab)="onTabChange($event)">
+            
+            <nb-tab tabTitle="Préfixes" [active]="isPrefixesActive">
+                <ngx-orange-avi-prefixe></ngx-orange-avi-prefixe>
+            </nb-tab>
+      
+            <nb-tab tabTitle="Modifier le profil" [active]="isTimesActive">
+                <ngx-orange-avi-profile></ngx-orange-avi-profile>
+                
+            </nb-tab>
+            
+        </nb-tabset>
+    </nb-card-body>
+</nb-card>

@@ -1,0 +1,31 @@
+.horaires-container {
+  background-color: #b0b0b0; /* Correspond au gris de ta capture */
+  border: 1px solid #999;
+  border-radius: 4px;
+
+  /* Force la table à ressembler à l'ancienne interface Windows */
+  .table {
+    border-collapse: collapse;
+    
+    th, td {
+      text-align: center;
+      padding: 0.25rem;
+      border: 1px solid #dee2e6;
+    }
+    
+    thead th {
+      background-color: #f8f9fa;
+      font-weight: normal;
+    }
+
+    /* Ligne sélectionnée en bleu */
+    .bg-primary {
+      background-color: #0056b3;
+    }
+  }
+}
+
+/* Espacement pour les boutons alignés à droite */
+.mr-2 {
+  margin-right: 0.5rem;
+}

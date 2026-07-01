@@ -1,0 +1,69 @@
+<nb-layout>
+  <nb-layout-column style="background-color: #f7f9fc; padding: 30px;">
+    <div style="max-width: 900px; margin: 0 auto;">
+      
+      <nb-card style="margin-bottom: 30px;">
+        <nb-card-header>
+          {{ isEditing ? 'Modifier les informations du client' : 'Ajouter un nouveau client' }}
+        </nb-card-header>
+        <nb-card-body>
+          <form [formGroup]="clientForm" (ngSubmit)="saveClient()">
+            <div style="margin-bottom: 15px;">
+              <input type="text" nbInput fullWidth placeholder="Nom" formControlName="nom">
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <input type="text" nbInput fullWidth placeholder="Prénom" formControlName="prenom">
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <input type="text" nbInput fullWidth placeholder="Téléphone" formControlName="telephone">
+            </div>
+            
+            <button type="submit" nbButton status="success" [disabled]="clientForm.invalid">
+              {{ isEditing ? 'Enregistrer les modifications' : 'Ajouter au registre' }}
+            </button>
+            
+            <button type="button" nbButton status="basic" (click)="resetForm()" *ngIf="isEditing" style="margin-left: 10px;">
+              Annuler
+            </button>
+          </form>
+        </nb-card-body>
+      </nb-card>
+
+      <nb-card>
+        <nb-card-header>Registre des Clients</nb-card-header>
+        <nb-card-body style="padding: 0;">
+          <table style="width: 100%; border-collapse: collapse; font-family: sans-serif;">
+            <thead>
+              <tr style="background-color: #f8f9fa; border-bottom: 2px solid #edf1f7; text-align: left;">
+                <th style="padding: 16px; color: #8f9bb3;">ID</th>
+                <th style="padding: 16px; color: #8f9bb3;">Nom</th>
+                <th style="padding: 16px; color: #8f9bb3;">Prénom</th>
+                <th style="padding: 16px; color: #8f9bb3;">Téléphone</th>
+                <th style="padding: 16px; color: #8f9bb3; text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let client of clients" style="border-bottom: 1px solid #edf1f7;">
+                <td style="padding: 16px;">{{ client.id }}</td>
+                <td style="padding: 16px; font-weight: bold;">{{ client.nom }}</td>
+                <td style="padding: 16px;">{{ client.prenom }}</td>
+                <td style="padding: 16px;">{{ client.telephone }}</td>
+                <td style="padding: 16px; text-align: center;">
+                  <button nbButton size="small" status="primary" (click)="editClient(client)" style="margin-right: 8px;">
+                    Modifier
+                  </button>
+                  <button nbButton size="small" status="danger" (click)="deleteClient(client.id)">
+                    Supprimer
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </nb-card-body>
+      </nb-card>
+
+    </div>
+  </nb-layout-column>
+</nb-layout>
