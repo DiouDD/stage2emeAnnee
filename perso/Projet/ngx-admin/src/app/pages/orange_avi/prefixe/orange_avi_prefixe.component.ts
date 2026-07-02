@@ -66,7 +66,7 @@ export class OrangeAviPrefixeComponent implements OnInit {
       next: (newOap) => event.confirm.resolve(newOap),
       error: () => event.confirm.reject()
     });
-  }
+  } 
 
   onEditConfirm(event: any): void {
     const payload: OrangeAviPrefixe = {

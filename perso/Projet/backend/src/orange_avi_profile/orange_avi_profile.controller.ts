@@ -9,9 +9,19 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  UsePipes,
 } from '@nestjs/common';
 import { OrangeAviProfileService } from './orange_avi_profile.service';
 import type { OrangeAviProfile } from './interfaces/orange_avi_profile.entity';
+import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
+import {
+  createOrangeAviProfileSchema,
+  updateOrangeAviProfileSchema,
+} from './schemas/orange_avi_profile.schema';
+import type {
+  CreateOrangeAviProfileDto,
+  UpdateOrangeAviProfileDto,
+} from './schemas/orange_avi_profile.schema';
 
 @Controller('oapros')
 export class OrangeAviProfileController {
@@ -30,16 +40,16 @@ export class OrangeAviProfileController {
   }
 
   @Post()
-  create(
-    @Body() client: Omit<OrangeAviProfile, 'id'>,
-  ): Promise<OrangeAviProfile> {
+  @UsePipes(new ZodValidationPipe(createOrangeAviProfileSchema))
+  create(@Body() client: CreateOrangeAviProfileDto): Promise<OrangeAviProfile> {
     return this.oapsService.create(client);
   }
 
   @Put(':id')
+  @UsePipes(new ZodValidationPipe(updateOrangeAviProfileSchema))
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() client: Partial<OrangeAviProfile>,
+    @Body() client: UpdateOrangeAviProfileDto,
   ): Promise<OrangeAviProfile | null> {
     return this.oapsService.update(id, client);
   }

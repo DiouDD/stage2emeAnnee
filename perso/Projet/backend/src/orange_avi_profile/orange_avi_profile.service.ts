@@ -2,6 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrangeAviProfile } from './interfaces/orange_avi_profile.entity';
+import {
+  CreateOrangeAviProfileDto,
+  UpdateOrangeAviProfileDto,
+} from './schemas/orange_avi_profile.schema';
 
 @Injectable()
 export class OrangeAviProfileService {
@@ -11,30 +15,28 @@ export class OrangeAviProfileService {
   ) {}
 
   async findAll(): Promise<OrangeAviProfile[]> {
-    const result = await this.oapRepository.find();
-    console.log('Données brutes reçues de MySQL :', result);
-    return result;
+    return this.oapRepository.find();
   }
 
   async findOne(uid: number): Promise<OrangeAviProfile | null> {
-    const result = await this.oapRepository.findOneBy({
-      uid: uid,
-    });
-    console.log('Données brutes reçues de MySQL :', result);
-    return result;
+    return this.oapRepository.findOneBy({ uid });
   }
 
-  async create(oap: Omit<OrangeAviProfile, 'uid'>): Promise<OrangeAviProfile> {
+  async create(oap: CreateOrangeAviProfileDto): Promise<OrangeAviProfile> {
     const oaps = await this.oapRepository.find();
     const newId = oaps.length > 0 ? Math.max(...oaps.map((c) => c.uid)) + 1 : 1;
-    const newOrange_avi_profile = { uid: newId, ...oap };
-    await this.oapRepository.save(newOrange_avi_profile);
-    return newOrange_avi_profile;
+    const newOrangeAviProfile = this.oapRepository.create({
+      uid: newId,
+      ...oap,
+    });
+
+    await this.oapRepository.save(newOrangeAviProfile);
+    return newOrangeAviProfile;
   }
 
   async update(
     uid: number,
-    updatedFields: Partial<OrangeAviProfile>,
+    updatedFields: UpdateOrangeAviProfileDto,
   ): Promise<OrangeAviProfile | null> {
     await this.findOne(uid);
     await this.oapRepository.update(uid, updatedFields);
