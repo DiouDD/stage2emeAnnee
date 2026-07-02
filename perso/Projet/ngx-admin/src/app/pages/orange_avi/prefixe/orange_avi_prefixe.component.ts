@@ -69,16 +69,28 @@ export class OrangeAviPrefixeComponent implements OnInit {
   } 
 
   onEditConfirm(event: any): void {
-    const payload: OrangeAviPrefixe = {
-      ...event.newData,
-      uid: Number(event.newData.uid),
-      id_profile: Number(event.newData.id_profile),
-      code_campagne: Number(event.newData.code_campagne)
-    };
+    const payload: Partial<OrangeAviPrefixe> = {
+      dnis: event.newData.dnis,
+      sda: event.newData.sda,
+      campagne: event.newData.campagne,
+      code_campagne: Number(event.newData.code_campagne),
+      customer: event.newData.customer,
+    };    
 
-    this.oapService.updateOap(payload).subscribe({
+    this.oapService.updateOap({ ...payload, uid: Number(event.newData.uid) } as OrangeAviPrefixe).subscribe({
       next: (updatedOap) => event.confirm.resolve(updatedOap),
-      error: () => event.confirm.reject()
+      error: (err) => {
+        console.error('Erreur de validation lors de la modification :', err.error);
+        if (err.error?.errors) {
+          const messages = err.error.errors
+            .map((e: any) => `${e.path}: ${e.message}`)
+            .join('\n');
+          alert(`Modification refusée :\n${messages}`);
+        } else {
+          alert("Une erreur est survenue lors de la modification.");
+        }
+        event.confirm.reject();
+      }
     });
   }
 
