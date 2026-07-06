@@ -298,6 +298,33 @@ Tableau en trop car duplication des données.
 Zod pas au bon endroit -> à décaler sur le backend -> cest lui qui envoie les données donc c'est a lui de vérifier si c'est OK
 Problème dans la forme des données dans le back. Le préfixe à un id_profile. Il faudrais qu'il ai directement un objet profile. 
 
+## Compte rendu du 03/07/2026
+
+📌 Point hebdomadaire – Semaine du 29 juin au 3 juillet 2026
+1. État d'esprit
+Semaine un peu plus difficile : des problèmes personnels m'ont fatigué, ce qui a probablement ralenti mon rythme de travail.
+2. Missions
+
+Correction de l'affichage en doublon d'un tableau sur la page principale du module.
+Restructuration du modèle de données côté backend : passage d'une relation par identifiant (id_profile) à une relation directe entre le préfixe et son profil (many-to-one / one-to-many).
+Migration de la validation des données (Zod) du frontend vers le backend, pour l'entité "profiles".
+
+3. Avancement
+
+Le tableau en doublon a été supprimé, corrigeant le problème de duplication des données identifié lors de la réunion du 26/06.
+La relation entre préfixe et profil a été revue pour que le préfixe possède directement un objet profil, conformément aux retours de l'équipe.
+Zod a été implémenté côté backend pour les profils, la logique de validation étant plus cohérente à cet endroit puisque c'est le backend qui envoie les données.
+
+4. Succès
+
+J'ai réussi à corriger le point bloquant identifié en réunion concernant la structure des données du préfixe.
+J'ai réussi à avancer sur mes tâches malgré une semaine personnellement compliquée.
+
+5. Débrief
+
+Le changement de modèle côté backend a désynchronisé le frontend, qui n'est plus adapté à la nouvelle structure des données.
+Cela génère encore des difficultés, notamment sur les fonctionnalités de modification, que je dois corriger la semaine prochaine pour que front et back soient de nouveau cohérents.
+
 ---
 
 Dans le cadre de ma deuxième année de BUT Informatique à l'IUT Clermont Auvergne, j'ai effectué un stage d'une durée de huit semaines, du 8 juin au 31 juillet 2026, au sein de l'entreprise Satel, une agence spécialisée dans la téléphonie située à Vichy. J'ai eu l'opportunité d'intégrer le service de la Direction des Systèmes d'Information (DSI), une équipe au cœur de l'infrastructure technique et logicielle de l'entreprise. Satel déploie son expertise autour de deux activités principales : le démarchage téléphonique (appels sortants) et le service après-vente (SAV / appels entrants) pour le compte de ses nombreuses entreprises partenaires.
