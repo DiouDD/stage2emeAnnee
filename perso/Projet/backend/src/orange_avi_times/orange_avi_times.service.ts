@@ -3,6 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrangeAviTimes } from './interfaces/orange_avi_times.entity';
 import { OrangeAviProfile } from '../orange_avi_profile/interfaces/orange_avi_profile.entity';
+import {
+  CreateOrangeAviTimesDto,
+  UpdateOrangeAviTimesDto,
+} from './schemas/orange_avi_times.schema';
 
 @Injectable()
 export class OrangeAviTimesService {
@@ -29,9 +33,7 @@ export class OrangeAviTimesService {
     });
   }
 
-  async create(
-    oap: Omit<OrangeAviTimes, 'uid'> & { profileUid?: number },
-  ): Promise<OrangeAviTimes> {
+  async create(oap: CreateOrangeAviTimesDto): Promise<OrangeAviTimes> {
     const oaps = await this.oapRepository.find();
     const newId = oaps.length > 0 ? Math.max(...oaps.map((c) => c.uid)) + 1 : 1;
 
@@ -50,7 +52,7 @@ export class OrangeAviTimesService {
 
   async update(
     uid: number,
-    updatedFields: Partial<OrangeAviTimes> & { profileUid?: number },
+    updatedFields: UpdateOrangeAviTimesDto,
   ): Promise<OrangeAviTimes | null> {
     const { profileUid, ...rest } = updatedFields;
     const updateData: Partial<Omit<OrangeAviTimes, 'profile'>> & {

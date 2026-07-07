@@ -9,9 +9,19 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  UsePipes,
 } from '@nestjs/common';
 import { OrangeAviTimesService } from './orange_avi_times.service';
 import type { OrangeAviTimes } from './interfaces/orange_avi_times.entity';
+import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
+import {
+  createOrangeAviTimesSchema,
+  updateOrangeAviTimesSchema,
+} from './schemas/orange_avi_times.schema';
+import type {
+  CreateOrangeAviTimesDto,
+  UpdateOrangeAviTimesDto,
+} from './schemas/orange_avi_times.schema';
 
 @Controller('oat')
 export class OrangeAviTimesController {
@@ -37,16 +47,16 @@ export class OrangeAviTimesController {
   }
 
   @Post()
-  create(
-    @Body() client: Omit<OrangeAviTimes, 'uid'> & { profileUid?: number },
-  ): Promise<OrangeAviTimes> {
+  @UsePipes(new ZodValidationPipe(createOrangeAviTimesSchema))
+  create(@Body() client: CreateOrangeAviTimesDto): Promise<OrangeAviTimes> {
     return this.oapsService.create(client);
   }
 
   @Put(':id')
+  @UsePipes(new ZodValidationPipe(updateOrangeAviTimesSchema))
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() client: Partial<OrangeAviTimes>,
+    @Body() client: UpdateOrangeAviTimesDto,
   ): Promise<OrangeAviTimes | null> {
     return this.oapsService.update(id, client);
   }

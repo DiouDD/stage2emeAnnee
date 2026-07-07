@@ -3,6 +3,7 @@ import { LocalDataSource } from 'ng2-smart-table';
 import { OrangeAviPrefixeService } from './orange_avi_prefixe.service';
 import { OrangeAviPrefixe } from './orange_avi_prefixe.model';
 import { OrangeAviProfile } from '../profile/orange_avi_profile.model';
+import { OrangeAviProfileService } from '../profile/orange_avi_profile.service';
 
 @Component({
   selector: 'ngx-orange-avi-prefixe',
@@ -13,37 +14,66 @@ export class OrangeAviPrefixeComponent implements OnInit {
 
   source: LocalDataSource = new LocalDataSource();
 
-  settings = {
-    add: {
-      addButtonContent: '<i class="nb-plus"></i>',
-      createButtonContent: '<i class="nb-checkmark"></i>',
-      cancelButtonContent: '<i class="nb-close"></i>',
-      confirmCreate: true,
-    },
-    edit: {
-      editButtonContent: '<i class="nb-edit"></i>',
-      saveButtonContent: '<i class="nb-checkmark"></i>',
-      cancelButtonContent: '<i class="nb-close"></i>',
-      confirmSave: true,
-    },
-    delete: {
-      deleteButtonContent: '<i class="nb-trash"></i>',
-      confirmDelete: true,
-    },
-    columns: {
-      dnis: { title: 'dnis', type: 'string' },
-      sda: { title: 'sda', type: 'string' },
-      campagne: { title: 'campagne', type: 'string' },
-      code_campagne: { title: 'code_campagne', type: 'number' },
-      customer: { title: 'Client', type: 'string' },
-      profile: { title: 'Profile', type: 'string', valuePrepareFunction: (profile : OrangeAviProfile) => { return profile ? profile.profile : ''; }},
-    },
-  };
+  profiles: OrangeAviProfile[] = [];
 
-  constructor(private oapService: OrangeAviPrefixeService) {}
+  settings: any;
+
+  constructor(
+    private oapService: OrangeAviPrefixeService,
+    private profileService: OrangeAviProfileService,
+  ) {
+    this.settings = this.buildSettings();
+  }
 
   ngOnInit(): void {
     this.loadOrangeAviPrefixe();
+    this.loadProfiles();
+  }
+
+  // Construit l'objet settings du tableau. La liste déroulante de la colonne "Profile"
+  // dépend de this.profiles : on doit reconstruire (et réassigner) settings à chaque
+  // changement de cette liste pour que ng2-smart-table reconstruise ses colonnes
+  // (une simple mutation en profondeur n'est pas détectée par le composant).
+  private buildSettings(): any {
+    return {
+      add: {
+        addButtonContent: '<i class="nb-plus"></i>',
+        createButtonContent: '<i class="nb-checkmark"></i>',
+        cancelButtonContent: '<i class="nb-close"></i>',
+        confirmCreate: true,
+      },
+      edit: {
+        editButtonContent: '<i class="nb-edit"></i>',
+        saveButtonContent: '<i class="nb-checkmark"></i>',
+        cancelButtonContent: '<i class="nb-close"></i>',
+        confirmSave: true,
+      },
+      delete: {
+        deleteButtonContent: '<i class="nb-trash"></i>',
+        confirmDelete: true,
+      },
+      columns: {
+        dnis: { title: 'dnis', type: 'string' },
+        sda: { title: 'sda', type: 'string' },
+        campagne: { title: 'campagne', type: 'string' },
+        code_campagne: { title: 'code_campagne', type: 'number' },
+        customer: { title: 'Client', type: 'string' },
+        profile: {
+          title: 'Profile',
+          type: 'string',
+          valuePrepareFunction: (profile: OrangeAviProfile) => { return profile ? profile.profile : ''; },
+          editor: {
+            type: 'list',
+            config: {
+              list: [
+                { value: '', title: '— Aucun —' },
+                ...this.profiles.map(p => ({ value: p.profile, title: p.profile })),
+              ],
+            },
+          },
+        },
+      },
+    };
   }
 
   // Charger tout les prefixe depuis la base de données
@@ -53,29 +83,69 @@ export class OrangeAviPrefixeComponent implements OnInit {
     });
   }
 
-  // Permet de créer un nouveau prefixe et de l'ajouter dans la BDD
+  // Charger les profils disponibles pour la liste déroulante de la colonne "Profile"
+  loadProfiles(): void {
+    this.profileService.getOaps().subscribe(profiles => {
+      this.profiles = profiles;
+      this.settings = this.buildSettings();
+    });
+  }
+
+  // Résout l'uid du profil à partir de la valeur du champ "profile" du formulaire :
+  // soit l'objet profil d'origine (champ non modifié), soit le nom choisi dans la liste déroulante.
+  private resolveProfileUid(profileValue: any): number | undefined {
+    if (!profileValue) {
+      return undefined;
+    }
+    if (typeof profileValue === 'object') {
+      return profileValue.uid;
+    }
+    const found = this.profiles.find(p => p.profile === profileValue);
+    return found ? found.uid : undefined;
+  }
+
   onCreateConfirm(event: any): void {
-    const payload: OrangeAviPrefixe = {
-      ...event.newData,
-      uid: Number(event.data.uid),
-      id_profile: Number(event.newData.id_profile),
-      code_campagne: Number(event.newData.code_campagne)
+    // On récupère le profileUid à partir du profil choisi dans la liste déroulante
+    const profileUid = this.resolveProfileUid(event.newData.profile);
+
+    // On crée le payload en incluant directement profileUid de manière conditionnelle
+    const payload = {
+      dnis: event.newData.dnis?.trim(),
+      sda: event.newData.sda?.trim(),
+      campagne: event.newData.campagne?.trim(),
+      code_campagne: Number(event.newData.code_campagne),
+      customer: event.newData.customer?.trim(),
+      // On l'ajoute s'il est présent, sinon on met undefined pour que Zod l'ignore (puisqu'il est .optional())
+      profileUid: profileUid ? Number(profileUid) : undefined,
     };
 
-    this.oapService.addOap(payload).subscribe({
-      next: (newOap) => event.confirm.resolve(newOap),
-      error: () => event.confirm.reject()
+    // On envoie le payload propre au service
+    this.oapService.addOap(payload as any).subscribe({
+      next: (newOap) => {
+        event.confirm.resolve(newOap);
+      },
+      error: (err) => {
+        console.error("Erreur lors de la création :", err.error);
+        alert("Une erreur est survenue lors de l'ajout.");
+        event.confirm.reject();
+      }
     });
-  } 
+  }
 
   onEditConfirm(event: any): void {
-    const payload: Partial<OrangeAviPrefixe> = {
+    // On récupère le profileUid à partir du profil choisi dans la liste déroulante.
+    // '' correspond à l'option "Aucun" : on envoie explicitement null pour délier le profil.
+    const rawProfile = event.newData.profile;
+    const profileUid = rawProfile === '' ? null : this.resolveProfileUid(rawProfile);
+
+    const payload: Partial<OrangeAviPrefixe> & { profileUid?: number | null } = {
       dnis: event.newData.dnis,
       sda: event.newData.sda,
       campagne: event.newData.campagne,
       code_campagne: Number(event.newData.code_campagne),
       customer: event.newData.customer,
-    };    
+      profileUid,
+    };
 
     this.oapService.updateOap({ ...payload, uid: Number(event.newData.uid) } as OrangeAviPrefixe).subscribe({
       next: (updatedOap) => event.confirm.resolve(updatedOap),

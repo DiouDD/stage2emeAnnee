@@ -296,7 +296,11 @@ Compte rendu d'une réunion sur l'avancement du projet
 
 Tableau en trop car duplication des données. 
 Zod pas au bon endroit -> à décaler sur le backend -> cest lui qui envoie les données donc c'est a lui de vérifier si c'est OK
-Problème dans la forme des données dans le back. Le préfixe à un id_profile. Il faudrais qu'il ai directement un objet profile. 
+Problème dans la forme des données dans le back. Le préfixe à un id_profile. Il faudrais qu'il ai directement un objet profile.
+
+## Réunion du 03/07/2026
+
+Voir pour regarder sur une version d'angular plus récentes.
 
 ---
 
