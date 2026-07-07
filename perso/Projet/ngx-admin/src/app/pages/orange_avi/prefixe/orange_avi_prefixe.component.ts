@@ -4,6 +4,7 @@ import { OrangeAviPrefixeService } from './orange_avi_prefixe.service';
 import { OrangeAviPrefixe } from './orange_avi_prefixe.model';
 import { OrangeAviProfile } from '../profile/orange_avi_profile.model';
 import { OrangeAviProfileService } from '../profile/orange_avi_profile.service';
+import { ProfileStateService } from '../profile/profile_state.service';
 
 @Component({
   selector: 'ngx-orange-avi-prefixe',
@@ -21,6 +22,7 @@ export class OrangeAviPrefixeComponent implements OnInit {
   constructor(
     private oapService: OrangeAviPrefixeService,
     private profileService: OrangeAviProfileService,
+    private profileStateService: ProfileStateService,
   ) {
     this.settings = this.buildSettings();
   }
@@ -60,8 +62,12 @@ export class OrangeAviPrefixeComponent implements OnInit {
         customer: { title: 'Client', type: 'string' },
         profile: {
           title: 'Profile',
-          type: 'string',
-          valuePrepareFunction: (profile: OrangeAviProfile) => { return profile ? profile.profile : ''; },
+          type: 'html',
+          valuePrepareFunction: (profile: OrangeAviProfile) => {
+            return profile
+              ? `<span class="profile-link" title="Voir le profil"><i class="nb-eye"></i> ${profile.profile}</span>`
+              : '';
+          },
           editor: {
             type: 'list',
             config: {
@@ -162,6 +168,15 @@ export class OrangeAviPrefixeComponent implements OnInit {
         event.confirm.reject();
       }
     });
+  }
+
+  // Clic sur une ligne du tableau : si elle a un profile associé, on l'ouvre
+  // dans l'onglet "Modifier le profil".
+  onRowSelect(event: any): void {
+    const profile: OrangeAviProfile | undefined = event?.data?.profile;
+    if (profile) {
+      this.profileStateService.changeProfile(profile, true);
+    }
   }
 
   onDeleteConfirm(event: any): void {

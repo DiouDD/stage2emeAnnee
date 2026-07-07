@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { LocalDataSource } from 'ng2-smart-table';
 import { OrangeAviProfileService } from './orange_avi_profile.service';
 import { ProfileStateService } from './profile_state.service';
@@ -9,7 +10,7 @@ import { OrangeAviProfile, OrangeAviProfileSchema } from './orange_avi_profile.m
   templateUrl: './orange_avi_profile.component.html',
   styleUrls: ['./orange_avi_profile.component.scss']
 })
-export class OrangeAviProfileComponent implements OnInit {
+export class OrangeAviProfileComponent implements OnInit, OnDestroy {
 
   // ==========================================
   // Propriétés / Propriétés de configuration
@@ -20,9 +21,12 @@ export class OrangeAviProfileComponent implements OnInit {
   selectedProfile: OrangeAviProfile | null = null;
   profiles: OrangeAviProfile[] = [];  
   newSelectedProfile: OrangeAviProfile | null = null;
-  isEditing: boolean = false;  
+  isEditing: boolean = false;
   audioOptions: string[] = [];
   selectedProfileId: number = 1;
+  private pendingProfileUid: number | null = null;
+
+  private profileSubscription: Subscription = new Subscription();
 
   // ==========================================
   // Constructeur & Cycles de vie
@@ -39,6 +43,36 @@ export class OrangeAviProfileComponent implements OnInit {
   ngOnInit(): void {
     this.loadOrangeAviProfiles();
     this.loadAudioOptions();
+
+    // Sélectionne le profil choisi depuis la page des préfixes (clic sur un profil)
+    this.profileSubscription = this.profileStateService.currentProfile$.subscribe(profile => {
+      if (profile) {
+        this.selectProfileByUid(profile.uid);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.profileSubscription.unsubscribe();
+  }
+
+  /**
+   * Sélectionne, parmi les profils déjà chargés, celui dont l'uid correspond.
+   * Si la liste n'est pas encore chargée (ex: clic venant de la page des préfixes
+   * avant la fin de l'appel HTTP initial), l'uid est mémorisé pour être résolu
+   * dès que loadOrangeAviProfiles() aura terminé.
+   */
+  private selectProfileByUid(uid: number): void {
+    const found = this.profiles.find(p => p.uid === uid);
+    if (found) {
+      this.pendingProfileUid = null;
+      this.selectedProfile = found;
+      this.newSelectedProfile = { ...found };
+      this.isEditing = false;
+      this.onProfileSelected(found.uid);
+    } else {
+      this.pendingProfileUid = uid;
+    }
   }
 
   // ==========================================
@@ -54,11 +88,13 @@ export class OrangeAviProfileComponent implements OnInit {
         this.source.load(data);
         this.profiles = data;
 
-        // Sélection automatique du premier profil au démarrage
-        if (data.length > 0 && !this.selectedProfile) {
+        if (this.pendingProfileUid != null) {
+          // Une sélection était en attente (course avec cet appel HTTP) : on la résout maintenant.
+          this.selectProfileByUid(this.pendingProfileUid);
+        } else if (data.length > 0 && !this.selectedProfile) {
+          // Sélection automatique du premier profil au démarrage
           this.selectedProfile = data[0];
           this.newSelectedProfile = { ...data[0] };
-          console.log('Profil chargé :', this.newSelectedProfile);
           this.onProfileSelected(data[0].uid);
         }
       },

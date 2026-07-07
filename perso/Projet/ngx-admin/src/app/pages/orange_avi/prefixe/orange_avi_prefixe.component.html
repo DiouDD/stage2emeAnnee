@@ -4,12 +4,13 @@
   </nb-card-header>
 
   <nb-card-body>
-    <ng2-smart-table 
-      [settings]="settings" 
+    <ng2-smart-table
+      [settings]="settings"
       [source]="source"
       (createConfirm)="onCreateConfirm($event)"
       (editConfirm)="onEditConfirm($event)"
-      (deleteConfirm)="onDeleteConfirm($event)">
+      (deleteConfirm)="onDeleteConfirm($event)"
+      (userRowSelect)="onRowSelect($event)">
     </ng2-smart-table>
   </nb-card-body>
 </nb-card>
