@@ -187,6 +187,85 @@ export class OrangeAviProfileComponent implements OnInit {
     }
   }
 
+  /**
+   * Enregistre les modifications du profil actuellement affiché (boutons du formulaire).
+   */
+  public onSaveClick(): void {
+    if (!this.newSelectedProfile) return;
+
+    // Plusieurs colonnes sont nullable en base (description, waiting_time, audio_*,
+    // type_dissuasion, ch1_dissuasion, menu_actif, barrage_entrant) mais le schéma Zod
+    // attend des chaînes/nombres non-null : on comble les null avant validation.
+    const dataToValidate = {
+      ...this.newSelectedProfile,
+      description: this.newSelectedProfile.description ?? '',
+      waiting_time: this.newSelectedProfile.waiting_time ?? 0,
+      audio_welcome: this.newSelectedProfile.audio_welcome ?? '',
+      audio_waiting: this.newSelectedProfile.audio_waiting ?? '',
+      audio_dissuasion: this.newSelectedProfile.audio_dissuasion ?? '',
+      audio_closing: this.newSelectedProfile.audio_closing ?? '',
+      audio_flash: this.newSelectedProfile.audio_flash ?? '',
+      audio_exceptionnel: this.newSelectedProfile.audio_exceptionnel ?? '',
+      type_dissuasion: this.newSelectedProfile.type_dissuasion ?? '',
+      ch1_dissuasion: this.newSelectedProfile.ch1_dissuasion ?? '',
+      menu_actif: this.newSelectedProfile.menu_actif ?? 0,
+      barrage_entrant: this.newSelectedProfile.barrage_entrant ?? '',
+    };
+
+    const result = OrangeAviProfileSchema.safeParse(dataToValidate);
+
+    if (result.success) {
+      this.oapService.updateOap(result.data).subscribe({
+        next: () => {
+          this.isEditing = false;
+          this.loadOrangeAviProfiles();
+          this.profileStateService.notifyProfilesChanged();
+        },
+        error: (err) => {
+          console.error("Erreur lors de la mise à jour du profil :", err);
+          alert("Erreur lors de la mise à jour du profil.");
+        }
+      });
+    } else {
+      console.error("Erreurs de validation Zod :", result.error.format());
+      alert("Données invalides. Vérifiez la console pour les détails du schéma.");
+    }
+  }
+
+  /**
+   * Annule les modifications en cours et restaure le profil sélectionné.
+   */
+  public onCancelClick(): void {
+    if (this.selectedProfile) {
+      this.newSelectedProfile = { ...this.selectedProfile };
+    }
+    this.isEditing = false;
+  }
+
+  /**
+   * Supprime le profil actuellement sélectionné.
+   */
+  public onDeleteClick(): void {
+    if (!this.selectedProfile) return;
+
+    const confirmed = confirm(`Voulez-vous vraiment supprimer le profil "${this.selectedProfile.profile}" ?`);
+    if (!confirmed) return;
+
+    this.oapService.deleteOap(this.selectedProfile.uid).subscribe({
+      next: () => {
+        this.selectedProfile = null;
+        this.newSelectedProfile = null;
+        this.isEditing = false;
+        this.loadOrangeAviProfiles();
+        this.profileStateService.notifyProfilesChanged();
+      },
+      error: (err) => {
+        console.error("Erreur lors de la suppression du profil :", err);
+        alert("Erreur lors de la suppression du profil. Il est peut-être encore utilisé par un préfixe.");
+      }
+    });
+  }
+
   // ==========================================
   // GESTION DES AUDIO OPTIONS (Événements)
   // ==========================================

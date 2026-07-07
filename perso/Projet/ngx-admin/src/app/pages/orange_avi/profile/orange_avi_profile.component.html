@@ -108,13 +108,13 @@
                 </div>
                 <div class="row mt-5">
                     <div class="col text-right">
-                        <button *ngIf="isEditing" nbButton outline status="primary">
+                        <button *ngIf="isEditing" nbButton outline status="primary" (click)="onCancelClick()">
                             Annuler les modifications
                         </button>
-                        <button *ngIf="isEditing" nbButton outline status="warning">
+                        <button *ngIf="isEditing" nbButton outline status="warning" (click)="onSaveClick()">
                             Enregistrer les modifications
                         </button>
-                        <button nbButton outline status="danger">Supprimer le profil</button>
+                        <button nbButton outline status="danger" (click)="onDeleteClick()">Supprimer le profil</button>
                     </div>
                 </div>
             </div>
