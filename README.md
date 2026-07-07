@@ -304,6 +304,8 @@ Voir pour regarder sur une version d'angular plus récentes.
 
 ## Compte rendu du 03/07/2026
 
+Peut tu faire sur la page profile un bouton pour ajouter un nouveau profile, qui va dupliquer celui déjà existant, avec toutes les horaires, le nom sera à modifier mais sera le nom du profil déja sélectionné auquel on aura ajouté "_copy"
+
 📌 Point hebdomadaire – Semaine du 29 juin au 3 juillet 2026
 1. État d'esprit
 Semaine un peu plus difficile : des problèmes personnels m'ont fatigué, ce qui a probablement ralenti mon rythme de travail.
