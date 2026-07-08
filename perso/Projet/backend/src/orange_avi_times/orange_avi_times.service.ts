@@ -34,12 +34,8 @@ export class OrangeAviTimesService {
   }
 
   async create(oap: CreateOrangeAviTimesDto): Promise<OrangeAviTimes> {
-    const oaps = await this.oapRepository.find();
-    const newId = oaps.length > 0 ? Math.max(...oaps.map((c) => c.uid)) + 1 : 1;
-
     const { profileUid, ...rest } = oap;
     const newTime = this.oapRepository.create({
-      uid: newId,
       ...rest,
       ...(profileUid
         ? { profile: { uid: profileUid } as OrangeAviProfile }

@@ -5,7 +5,7 @@
                 <label class="label">Nom</label>
             </div>
             <div class="col-md-5">
-                <nb-select 
+                <nb-select
                     [(ngModel)]="selectedProfile"
                     (selectedChange)="onProfileChange($event?.profile)"
                     [compareWith]="compareFn">
@@ -13,6 +13,11 @@
                         {{ profile.profile }}
                     </nb-option>
                 </nb-select>
+            </div>
+            <div class="col-md-6">
+                <button nbButton outline status="info" [disabled]="!selectedProfile" (click)="onDuplicateClick()">
+                    Ajouter un nouveau profil (dupliquer)
+                </button>
             </div>
         </div>
         <div class="row" *ngIf="newSelectedProfile">
