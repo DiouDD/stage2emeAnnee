@@ -195,7 +195,7 @@ export class OrangeAviTimesComponent implements OnInit {
       });
     }
   }
-
+  
   // ==========================================
   // COMPATIBILITÉ SMART-TABLE (Inline CRUD Events)
   // ==========================================

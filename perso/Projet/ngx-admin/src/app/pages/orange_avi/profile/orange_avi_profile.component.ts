@@ -26,6 +26,7 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
   isEditing: boolean = false;
   audioOptions: string[] = [];
   selectedProfileId: number = 1;
+  isEditingProfileName: boolean = false;
   private pendingProfileUid: number | null = null;
 
   private profileSubscription: Subscription = new Subscription();
@@ -72,6 +73,7 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
       this.selectedProfile = found;
       this.newSelectedProfile = { ...found };
       this.isEditing = false;
+      this.isEditingProfileName = false;
       this.onProfileSelected(found.uid);
     } else {
       this.pendingProfileUid = uid;
@@ -125,8 +127,25 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
       this.onProfileSelected(selectedProf.uid);
     }
     this.isEditing = false;
+    this.isEditingProfileName = false;
   }
 
+
+  /**
+   * Passe en mode édition du nom du profil sélectionné (bascule le select vers un champ texte).
+   * L'enregistrement se fait via le bouton "Enregistrer les modifications" déjà existant.
+   */
+  public onEditProfileNameClick(): void {
+    if (!this.selectedProfile) return;
+    this.isEditingProfileName = true;
+  }
+
+  /**
+   * Marque le formulaire comme modifié suite à la saisie du nom du profil.
+   */
+  public onProfileNameInputChange(): void {
+    this.isEditing = true;
+  }
 
   /**
    * Intercepte et valide la création d'un nouveau profil via le tableau.
@@ -232,11 +251,17 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
   public onSaveClick(): void {
     if (!this.newSelectedProfile) return;
 
+    if (!this.newSelectedProfile.profile?.trim()) {
+      alert("Le nom du profil ne peut pas être vide.");
+      return;
+    }
+
     // Plusieurs colonnes sont nullable en base (description, waiting_time, audio_*,
     // type_dissuasion, ch1_dissuasion, menu_actif, barrage_entrant) mais le schéma Zod
     // attend des chaînes/nombres non-null : on comble les null avant validation.
     const dataToValidate = {
       ...this.newSelectedProfile,
+      profile: this.newSelectedProfile.profile.trim(),
       description: this.newSelectedProfile.description ?? '',
       waiting_time: this.newSelectedProfile.waiting_time ?? 0,
       audio_welcome: this.newSelectedProfile.audio_welcome ?? '',
@@ -255,8 +280,11 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
 
     if (result.success) {
       this.oapService.updateOap(result.data).subscribe({
-        next: () => {
+        next: (updated) => {
           this.isEditing = false;
+          this.isEditingProfileName = false;
+          this.selectedProfile = updated;
+          this.newSelectedProfile = { ...updated };
           this.loadOrangeAviProfiles();
           this.profileStateService.notifyProfilesChanged();
         },
@@ -279,6 +307,7 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
       this.newSelectedProfile = { ...this.selectedProfile };
     }
     this.isEditing = false;
+    this.isEditingProfileName = false;
   }
 
   /**
