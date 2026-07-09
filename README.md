@@ -329,6 +329,14 @@ J'ai réussi à avancer sur mes tâches malgré une semaine personnellement comp
 Le changement de modèle côté backend a désynchronisé le frontend, qui n'est plus adapté à la nouvelle structure des données.
 Cela génère encore des difficultés, notamment sur les fonctionnalités de modification, que je dois corriger la semaine prochaine pour que front et back soient de nouveau cohérents.
 
+## PROBLEME DU 08/07
+
+Problème : erreurs 500 lors de la duplication des horaires d'un profil (race condition sur l'attribution des identifiants)
+
+Lors de la duplication d'un profil, les horaires associés étaient recréés via une boucle envoyant toutes les requêtes de création en parallèle. Or le service back-end calculait lui-même le prochain identifiant en lisant le maximum existant, au lieu de s'appuyer sur l'auto-incrément de la base. Les requêtes simultanées lisant le même maximum avant toute insertion, elles tentaient d'insérer le même identifiant : la contrainte de clé primaire était violée, provoquant des erreurs 500 et la perte silencieuse de certains horaires.
+
+Résolution : suppression du calcul manuel de l'identifiant côté back-end, en laissant la base de données l'attribuer automatiquement et de manière atomique lors de l'insertion. Cela supprime la concurrence à la racine et garantit qu'un identifiant unique est généré pour chaque horaire, même lorsque les requêtes arrivent simultanément.
+
 ---
 
 Dans le cadre de ma deuxième année de BUT Informatique à l'IUT Clermont Auvergne, j'ai effectué un stage d'une durée de huit semaines, du 8 juin au 31 juillet 2026, au sein de l'entreprise Satel, une agence spécialisée dans la téléphonie située à Vichy. J'ai eu l'opportunité d'intégrer le service de la Direction des Systèmes d'Information (DSI), une équipe au cœur de l'infrastructure technique et logicielle de l'entreprise. Satel déploie son expertise autour de deux activités principales : le démarchage téléphonique (appels sortants) et le service après-vente (SAV / appels entrants) pour le compte de ses nombreuses entreprises partenaires.

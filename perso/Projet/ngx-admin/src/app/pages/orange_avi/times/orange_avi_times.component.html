@@ -1,64 +1,73 @@
 <div class="horaires-container p-3 mb-3">
     <label class="label mb-2 d-block bg-white d-inline-block px-1 border">3. Les horaires et exceptions</label>
-    <div class="table-responsive bg-white">
-        <table class="table table-bordered table-sm table-hover mb-0">
-            <thead>
-                <tr>
-                    <th>Jour de la semaine</th>
-                    <th>Heure d'ouverture</th>
-                    <th>Heure de fermeture</th>
-                    <th class="text-center" style="width: 160px;">Actions</th> 
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngIf="selectedProfileTimes.length === 0">
-                    <td colspan="4" class="text-center text-muted">Aucun horaire configuré pour ce profil</td> 
-                </tr>
-                <tr *ngFor="let time of selectedProfileTimes" [class.table-primary]="editingTimeId === time.uid">
-                    <td>{{ jourDeLaSemaine[time.dow-1] }}</td> 
-                    <td>{{ time.opening_time }}</td>
-                    <td>{{ time.closing_time }}</td>
-                    <td class="text-center">
-                        <!-- Bouton Sélectionner pour modification -->
-                        <button nbButton ghost status="warning" size="tiny" class="mr-1" (click)="onSelectTimeToEdit(time)">
-                            <nb-icon icon="edit-2-outline"></nb-icon>
-                        </button>
-                        <!-- Bouton Supprimer -->
-                        <button nbButton ghost status="danger" size="tiny" (click)="onDeleteTime(time.uid)">
-                            <nb-icon icon="trash-2-outline"></nb-icon>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <!-- Formulaire d'ajout / modification d'une ligne d'horaire -->
-    <div class="row align-items-center mt-3">
-        <div class="col-sm-4">
-            <!-- Remplacement du binding par l'index ou le jour exact (selon votre TS, ici basé sur l'index de dow) -->
-            <nb-select fullWidth [(ngModel)]="newTimeDay" size="small">
-                <nb-option *ngFor="let day of jourDeLaSemaine; let i = index" [value]="(i + 1).toString()">
-                    {{ day }}
-                </nb-option>
-            </nb-select>
-        </div>
-        <div class="col-sm-4">
-            <input type="time" nbInput fullWidth [(ngModel)]="newTimeOpening" fieldSize="small">
-        </div>
-        <div class="col-sm-4">
-            <input type="time" nbInput fullWidth [(ngModel)]="newTimeClosing" fieldSize="small">
-        </div>
-    </div>            
-    <div class="row mt-3">
-        <div class="col-12 text-right">
-            <!-- Si on n'est pas en train d'éditer, on affiche Ajouter. Sinon, Modifier/Annuler -->
-            <ng-container *ngIf="!editingTimeId; else editButtons">
-                <button nbButton outline status="primary" size="small" (click)="onAddTime()">Ajouter l'horaire</button>
-            </ng-container>
-            <ng-template #editButtons>
-                <button nbButton outline status="ghost" size="small" class="mr-2" (click)="onCancelEditTime()">Annuler</button>
-                <button nbButton outline status="warning" size="small" (click)="onUpdateTime()">Enregistrer la modification</button>
-            </ng-template>
-        </div>
-    </div>
+    <nb-tabset fullWidth>
+        <nb-tab tabTitle="Horaires" [active]="true">
+            <div class="table-responsive bg-white">
+                <table class="table table-bordered table-sm table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Jour de la semaine</th>
+                            <th>Heure d'ouverture</th>
+                            <th>Heure de fermeture</th>
+                            <th class="text-center" style="width: 160px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngIf="selectedProfileTimes.length === 0">
+                            <td colspan="4" class="text-center text-muted">Aucun horaire configuré pour ce profil</td>
+                        </tr>
+                        <tr *ngFor="let time of selectedProfileTimes" [class.table-primary]="editingTimeId === time.uid">
+                            <td>{{ jourDeLaSemaine[time.dow-1] }}</td>
+                            <td>{{ time.opening_time }}</td>
+                            <td>{{ time.closing_time }}</td>
+                            <td class="text-center">
+                                <!-- Bouton Sélectionner pour modification -->
+                                <button nbButton ghost status="warning" size="tiny" class="mr-1" (click)="onSelectTimeToEdit(time)">
+                                    <nb-icon icon="edit-2-outline"></nb-icon>
+                                </button>
+                                <!-- Bouton Supprimer -->
+                                <button nbButton ghost status="danger" size="tiny" (click)="onDeleteTime(time.uid)">
+                                    <nb-icon icon="trash-2-outline"></nb-icon>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Formulaire d'ajout / modification d'une ligne d'horaire -->
+            <div class="row align-items-center mt-3">
+                <div class="col-sm-4">
+                    <!-- Remplacement du binding par l'index ou le jour exact (selon votre TS, ici basé sur l'index de dow) -->
+                    <nb-select fullWidth [(ngModel)]="newTimeDay" size="small">
+                        <nb-option *ngFor="let day of jourDeLaSemaine; let i = index" [value]="(i + 1).toString()">
+                            {{ day }}
+                        </nb-option>
+                    </nb-select>
+                </div>
+                <div class="col-sm-4">
+                    <input type="time" nbInput fullWidth [(ngModel)]="newTimeOpening" fieldSize="small">
+                </div>
+                <div class="col-sm-4">
+                    <input type="time" nbInput fullWidth [(ngModel)]="newTimeClosing" fieldSize="small">
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12 text-right">
+                    <!-- Si on n'est pas en train d'éditer, on affiche Ajouter. Sinon, Modifier/Annuler -->
+                    <ng-container *ngIf="!editingTimeId; else editButtons">
+                        <button nbButton outline status="primary" size="small" (click)="onAddTime()">Ajouter l'horaire</button>
+                    </ng-container>
+                    <ng-template #editButtons>
+                        <button nbButton outline status="ghost" size="small" class="mr-2" (click)="onCancelEditTime()">Annuler</button>
+                        <button nbButton outline status="warning" size="small" (click)="onUpdateTime()">Enregistrer la modification</button>
+                    </ng-template>
+                </div>
+            </div>
+        </nb-tab>
+        <nb-tab tabTitle="Exceptions">
+            <div class="text-center text-muted p-3">
+                Aucune exception configurée pour ce profil.
+            </div>
+        </nb-tab>
+    </nb-tabset>
 </div>

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-// Schéma de création : reflète les colonnes de l'entité (hors uid, généré par la DB)
+// Schéma de création
 // + profileUid, optionnel, pour lier un profil au moment de la création.
 export const createOrangeAviPrefixeSchema = z.object({
   dnis: z.string().trim().min(1, 'dnis est requis').max(50),
@@ -28,7 +28,7 @@ export type UpdateOrangeAviPrefixeDto = z.infer<
   typeof updateOrangeAviPrefixeSchema
 >;
 
-// Schéma pour valider le param :id des routes (utile si tu veux remplacer ParseIntPipe)
+// Schéma pour valider le param :id des routes
 export const idParamSchema = z.object({
   id: z.coerce.number().int().positive(),
 });
