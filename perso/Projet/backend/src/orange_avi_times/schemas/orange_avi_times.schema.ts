@@ -7,8 +7,8 @@ export const createOrangeAviTimesSchema = z.object({
   dow: z.coerce
     .number()
     .int('dow doit être un entier')
-    .min(1, 'dow doit être compris entre 1 et 7')
-    .max(7, 'dow doit être compris entre 1 et 7')
+    .min(0, 'dow doit être compris entre 0 (exception) et 7')
+    .max(7, 'dow doit être compris entre 0 (exception) et 7')
     .optional(),
   opening_time: z
     .string()

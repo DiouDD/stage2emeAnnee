@@ -34,14 +34,22 @@ export class OrangeAviTimesComponent implements OnInit {
   }
 
   // Formulaire d'ajout / édition d'un horaire (Valeurs par défaut)
-  newTime: OrangeAviTimes | null = null; 
-  newTimeDay: string = 'Lundi'; 
-  newTimeOpening: string = '08:30'; 
-  newTimeClosing: string = '11:00'; 
+  newTime: OrangeAviTimes | null = null;
+  newTimeDay: string = 'Lundi';
+  newTimeOpening: string = '08:30';
+  newTimeClosing: string = '11:00';
 
   // États de modification
   editingTimeId: any = null;                           // UID de l'horaire en cours d'édition (null si aucun)
   isEditing: boolean = false;                           // Indique si le profil général a été modifié
+
+  // Formulaire d'ajout / édition d'une exception (Valeurs par défaut : dow = 0, horaires à 00:00)
+  newExceptionDate: Date = new Date();
+  newExceptionOpening: string = '00:00';
+  newExceptionClosing: string = '00:00';
+
+  // État de modification
+  editingExceptionId: any = null;                       // UID de l'exception en cours d'édition (null si aucune)
 
   constructor(
     private oatService: OrangeAviTimesService, 
@@ -206,6 +214,119 @@ export class OrangeAviTimesComponent implements OnInit {
     }
   }
   
+  // ==========================================
+  // GESTION DES EXCEPTIONS (Exceptions CRUD)
+  // ==========================================
+
+  /**
+   * Ajoute une nouvelle exception (horaire ponctuel pour une date précise, dow = 0)
+   */
+  onAddException(): void {
+    if (!this.selectedProfileId) {
+      alert("Veuillez sélectionner un profil avant d'ajouter une exception.");
+      return;
+    }
+
+    const exceptionToTemplate = {
+      profileUid: this.selectedProfileId,
+      day: this.newExceptionDate,
+      dow: 0,
+      opening_time: this.newExceptionOpening,
+      closing_time: this.newExceptionClosing
+    };
+
+    this.oatService.addOat(exceptionToTemplate as any).subscribe({
+      next: (createdOat) => {
+        console.log("Nouvelle exception ajoutée avec succès :", createdOat);
+
+        if (this.selectedProfileId) {
+          this.loadOrangeAviTime(this.selectedProfileId);
+        }
+
+        // Réinitialisation du formulaire aux valeurs par défaut
+        this.newExceptionDate = new Date();
+        this.newExceptionOpening = '00:00';
+        this.newExceptionClosing = '00:00';
+      },
+      error: (err) => {
+        console.error("Erreur lors de l'ajout de l'exception :", err);
+        alert("Une erreur est survenue lors de l'enregistrement de l'exception.");
+      }
+    });
+  }
+
+  /**
+   * Bascule l'interface du formulaire en mode édition et y injecte l'exception sélectionnée
+   */
+  onSelectExceptionToEdit(time: OrangeAviTimes): void {
+    this.editingExceptionId = time.uid;
+    this.newExceptionDate = new Date(time.day);
+    this.newExceptionOpening = time.opening_time;
+    this.newExceptionClosing = time.closing_time;
+  }
+
+  /**
+   * Soumet les modifications d'une exception existante à l'API
+   */
+  onUpdateException(): void {
+    if (!this.selectedProfileId || !this.editingExceptionId) return;
+
+    const updatedException = {
+      uid: this.editingExceptionId,
+      profileUid: this.selectedProfileId,
+      day: this.newExceptionDate,
+      dow: 0,
+      opening_time: this.newExceptionOpening,
+      closing_time: this.newExceptionClosing
+    };
+
+    this.oatService.updateOat(updatedException as any).subscribe({
+      next: (res) => {
+        console.log("Exception mise à jour avec succès :", res);
+
+        if (this.selectedProfileId) {
+          this.loadOrangeAviTime(this.selectedProfileId);
+        }
+
+        this.onCancelEditException(); // Fermeture et reset du formulaire
+      },
+      error: (err) => {
+        console.error("Erreur lors de la modification de l'exception :", err);
+        alert("Une erreur est survenue lors de la modification de l'exception.");
+      }
+    });
+  }
+
+  /**
+   * Annule l'édition d'une exception et vide le formulaire
+   */
+  onCancelEditException(): void {
+    this.editingExceptionId = null;
+    this.newExceptionDate = new Date();
+    this.newExceptionOpening = '00:00';
+    this.newExceptionClosing = '00:00';
+  }
+
+  /**
+   * Supprime une exception via son UID
+   */
+  onDeleteException(uid: number): void {
+    if (window.confirm("Voulez-vous vraiment supprimer cette exception ?")) {
+      this.oatService.deleteOat(uid).subscribe({
+        next: () => {
+          console.log(`Exception avec l'UID ${uid} supprimée avec succès.`);
+          if (this.selectedProfileId) {
+            this.loadOrangeAviTime(this.selectedProfileId);
+          }
+        },
+        error: (err) => {
+          console.error("Erreur lors de la suppression de l'exception :", err);
+          alert("Une erreur est survenue lors de la suppression de l'exception.");
+        }
+      });
+    }
+  }
+
   // ==========================================
   // COMPATIBILITÉ SMART-TABLE (Inline CRUD Events)
   // ==========================================

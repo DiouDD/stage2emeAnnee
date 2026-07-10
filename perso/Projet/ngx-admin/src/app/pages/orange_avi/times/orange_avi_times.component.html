@@ -72,19 +72,55 @@
                             <th>Date</th>
                             <th>Heure d'ouverture</th>
                             <th>Heure de fermeture</th>
+                            <th class="text-center" style="width: 160px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr *ngIf="exceptionTimes.length === 0">
-                            <td colspan="3" class="text-center text-muted">Aucune exception configurée pour ce profil</td>
+                            <td colspan="4" class="text-center text-muted">Aucune exception configurée pour ce profil</td>
                         </tr>
-                        <tr *ngFor="let time of exceptionTimes">
+                        <tr *ngFor="let time of exceptionTimes" [class.table-primary]="editingExceptionId === time.uid">
                             <td>{{ time.day | date:'dd/MM/yyyy' }}</td>
                             <td>{{ time.opening_time }}</td>
                             <td>{{ time.closing_time }}</td>
+                            <td class="text-center">
+                                <!-- Bouton Sélectionner pour modification -->
+                                <button nbButton ghost status="warning" size="tiny" class="mr-1" (click)="onSelectExceptionToEdit(time)">
+                                    <nb-icon icon="edit-2-outline"></nb-icon>
+                                </button>
+                                <!-- Bouton Supprimer -->
+                                <button nbButton ghost status="danger" size="tiny" (click)="onDeleteException(time.uid)">
+                                    <nb-icon icon="trash-2-outline"></nb-icon>
+                                </button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+            <!-- Formulaire d'ajout / modification d'une exception -->
+            <div class="row align-items-center mt-3">
+                <div class="col-sm-4">
+                    <input type="text" nbInput fullWidth [nbDatepicker]="exceptionDatepicker" [(ngModel)]="newExceptionDate" placeholder="Sélectionner une date" fieldSize="small">
+                    <nb-datepicker #exceptionDatepicker></nb-datepicker>
+                </div>
+                <div class="col-sm-4">
+                    <input type="time" nbInput fullWidth [(ngModel)]="newExceptionOpening" fieldSize="small">
+                </div>
+                <div class="col-sm-4">
+                    <input type="time" nbInput fullWidth [(ngModel)]="newExceptionClosing" fieldSize="small">
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12 text-right">
+                    <!-- Si on n'est pas en train d'éditer, on affiche Ajouter. Sinon, Modifier/Annuler -->
+                    <ng-container *ngIf="!editingExceptionId; else editExceptionButtons">
+                        <button nbButton outline status="primary" size="small" (click)="onAddException()">Ajouter l'exception</button>
+                    </ng-container>
+                    <ng-template #editExceptionButtons>
+                        <button nbButton outline status="ghost" size="small" class="mr-2" (click)="onCancelEditException()">Annuler</button>
+                        <button nbButton outline status="warning" size="small" (click)="onUpdateException()">Enregistrer la modification</button>
+                    </ng-template>
+                </div>
             </div>
         </nb-tab>
     </nb-tabset>
