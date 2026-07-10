@@ -13,10 +13,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngIf="selectedProfileTimes.length === 0">
+                        <tr *ngIf="regularTimes.length === 0">
                             <td colspan="4" class="text-center text-muted">Aucun horaire configuré pour ce profil</td>
                         </tr>
-                        <tr *ngFor="let time of selectedProfileTimes" [class.table-primary]="editingTimeId === time.uid">
+                        <tr *ngFor="let time of regularTimes" [class.table-primary]="editingTimeId === time.uid">
                             <td>{{ jourDeLaSemaine[time.dow-1] }}</td>
                             <td>{{ time.opening_time }}</td>
                             <td>{{ time.closing_time }}</td>
@@ -65,8 +65,26 @@
             </div>
         </nb-tab>
         <nb-tab tabTitle="Exceptions">
-            <div class="text-center text-muted p-3">
-                Aucune exception configurée pour ce profil.
+            <div class="table-responsive bg-white">
+                <table class="table table-bordered table-sm table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Heure d'ouverture</th>
+                            <th>Heure de fermeture</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngIf="exceptionTimes.length === 0">
+                            <td colspan="3" class="text-center text-muted">Aucune exception configurée pour ce profil</td>
+                        </tr>
+                        <tr *ngFor="let time of exceptionTimes">
+                            <td>{{ time.day | date:'dd/MM/yyyy' }}</td>
+                            <td>{{ time.opening_time }}</td>
+                            <td>{{ time.closing_time }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </nb-tab>
     </nb-tabset>

@@ -23,6 +23,16 @@ export class OrangeAviTimesComponent implements OnInit {
   // Configuration des jours de la semaine
   jourDeLaSemaine = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
+  // Horaires exceptionnels (dow = 0 : date précise plutôt qu'un jour de la semaine récurrent)
+  get exceptionTimes(): OrangeAviTimes[] {
+    return this.selectedProfileTimes.filter(time => time.dow === 0);
+  }
+
+  // Horaires récurrents (dow != 0 : jour de la semaine, à exclure des exceptions)
+  get regularTimes(): OrangeAviTimes[] {
+    return this.selectedProfileTimes.filter(time => time.dow !== 0);
+  }
+
   // Formulaire d'ajout / édition d'un horaire (Valeurs par défaut)
   newTime: OrangeAviTimes | null = null; 
   newTimeDay: string = 'Lundi'; 
