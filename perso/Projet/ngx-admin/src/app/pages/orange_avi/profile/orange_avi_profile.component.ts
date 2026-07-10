@@ -45,15 +45,19 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
    * Initialisation du composant.
    */
   ngOnInit(): void {
-    this.loadOrangeAviProfiles();
+    console.dir('ngOnInits')
     this.loadAudioOptions();
+    this.loadOrangeAviProfiles();
 
     // Sélectionne le profil choisi depuis la page des préfixes (clic sur un profil)
     this.profileSubscription = this.profileStateService.currentProfile$.subscribe(profile => {
+      console.dir(`profileStateService.currentProfile`)
+      console.dir(profile)
       if (profile) {
         this.selectProfileByUid(profile.uid);
       }
     });
+    console.dir(this.newSelectedProfile)
   }
 
   ngOnDestroy(): void {
@@ -75,6 +79,7 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
       this.isEditing = false;
       this.isEditingProfileName = false;
       this.onProfileSelected(found.uid);
+      console.dir(this.newSelectedProfile)
     } else {
       this.pendingProfileUid = uid;
     }
@@ -93,7 +98,7 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
         this.source.load(data);
         this.profiles = data;
 
-        if (this.pendingProfileUid != null) {
+        /*if (this.pendingProfileUid != null) {
           // Une sélection était en attente (course avec cet appel HTTP) : on la résout maintenant.
           this.selectProfileByUid(this.pendingProfileUid);
         } else if (data.length > 0 && !this.selectedProfile) {
@@ -101,7 +106,7 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
           this.selectedProfile = data[0];
           this.newSelectedProfile = { ...data[0] };
           this.onProfileSelected(data[0].uid);
-        }
+        }*/
       },
       error: (err) => {
         console.error('Erreur lors du chargement des profils :', err);

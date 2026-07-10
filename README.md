@@ -337,6 +337,12 @@ Lors de la duplication d'un profil, les horaires associés étaient recréés vi
 
 Résolution : suppression du calcul manuel de l'identifiant côté back-end, en laissant la base de données l'attribuer automatiquement et de manière atomique lors de l'insertion. Cela supprime la concurrence à la racine et garantit qu'un identifiant unique est généré pour chaque horaire, même lorsque les requêtes arrivent simultanément.
 
+## Reunion du 09/07
+
+Voir pour mettre un form control pour tout les profils. Rajouter le SVI
+Aidé a mettre le profil au démarrage
+Pour les messages d'acceuil mattre Aucun au ieu de null
+Autre problème lors de la duplication, possibilité d'envoyer un objet profile avec tout les times dedans au lieu d'un profile et plein de times a coté
 ---
 
 Dans le cadre de ma deuxième année de BUT Informatique à l'IUT Clermont Auvergne, j'ai effectué un stage d'une durée de huit semaines, du 8 juin au 31 juillet 2026, au sein de l'entreprise Satel, une agence spécialisée dans la téléphonie située à Vichy. J'ai eu l'opportunité d'intégrer le service de la Direction des Systèmes d'Information (DSI), une équipe au cœur de l'infrastructure technique et logicielle de l'entreprise. Satel déploie son expertise autour de deux activités principales : le démarchage téléphonique (appels sortants) et le service après-vente (SAV / appels entrants) pour le compte de ses nombreuses entreprises partenaires.
@@ -351,3 +357,4 @@ Comment concevoir et intégrer un module web centralisé au sein de l'applicatio
 En effet, la réalisation de ce projet présentait un défi de taille : l'architecture de Satel Platform repose sur les frameworks Angular (pour la partie front-end) et NestJS (pour la partie back-end), deux technologies modernes qui m'étaient seulement connues par leur nom à mon arrivée. Ma première semaine de stage a donc été intégralement consacrée à une phase intensive de recherche, de prise en main et de manipulation de ces outils afin de monter en compétences et d'acquérir l'autonomie nécessaire au développement.
 
 L'objectif final et le livrable attendu à l'issue de ces huit semaines de stage consistent à livrer un module complet, autonome et parfaitement fonctionnel en environnement local. Ce module doit être techniquement mûr pour être importé et déployé à terme sur la plateforme de production de Satel. De plus, afin de décorréler le développement des données sensibles de l'entreprise, l'architecture du module a été pensée sans lien direct avec la base de données de production. Cette approche offre le double avantage de sécuriser l'application logicielle tout en me permettant de conserver l'intégralité du code source développé afin de valoriser pleinement ce travail technique lors de mes futures démarches universitaires et professionnelles.
+
