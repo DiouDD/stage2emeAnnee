@@ -8,6 +8,8 @@ import { OrangeAviProfile } from './orange_avi_profile/interfaces/orange_avi_pro
 import { OrangeAviProfileModule } from './orange_avi_profile/orange_avi_profile.module';
 import { OrangeAviTimes } from './orange_avi_times/interfaces/orange_avi_times.entity';
 import { OrangeAviTimesModule } from './orange_avi_times/orange_avi_times.module';
+import { OrangeAviSvi } from './orange_avi_svi/interfaces/orange_avi_svi.entity';
+import { OrangeAviSviModule } from './orange_avi_svi/orange_avi_svi.module';
 
 @Module({
   imports: [
@@ -18,12 +20,18 @@ import { OrangeAviTimesModule } from './orange_avi_times/orange_avi_times.module
       username: 'root',
       password: 'changeme',
       database: 'orange_db',
-      entities: [OrangeAviPrefixe, OrangeAviProfile, OrangeAviTimes], // Ajoutez votre entité ici aussi si vous n'utilisez pas d'auto-load
+      entities: [
+        OrangeAviPrefixe,
+        OrangeAviProfile,
+        OrangeAviTimes,
+        OrangeAviSvi,
+      ], // Ajoutez votre entité ici aussi si vous n'utilisez pas d'auto-load
       synchronize: true, // /!\ À désactiver en production, pratique en développement
     }),
     OrangeAviPrefixeModule,
     OrangeAviProfileModule,
     OrangeAviTimesModule,
+    OrangeAviSviModule,
   ],
   controllers: [AppController],
   providers: [AppService],
