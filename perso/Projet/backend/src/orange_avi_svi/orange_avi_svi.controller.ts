@@ -9,13 +9,19 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  UsePipes,
 } from '@nestjs/common';
 import { OrangeAviSviService } from './orange_avi_svi.service';
 import type { OrangeAviSvi } from './interfaces/orange_avi_svi.entity';
+import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
+import {
+  createOrangeAviSviSchema,
+  updateOrangeAviSviSchema,
+} from './schemas/orange_avi_svi.schema';
 import type {
   CreateOrangeAviSviDto,
   UpdateOrangeAviSviDto,
-} from './orange_avi_svi.dto';
+} from './schemas/orange_avi_svi.schema';
 
 @Controller('oasvi')
 export class OrangeAviSviController {
@@ -39,11 +45,13 @@ export class OrangeAviSviController {
   }
 
   @Post()
+  @UsePipes(new ZodValidationPipe(createOrangeAviSviSchema))
   create(@Body() body: CreateOrangeAviSviDto): Promise<OrangeAviSvi> {
     return this.oasService.create(body);
   }
 
   @Put(':id')
+  @UsePipes(new ZodValidationPipe(updateOrangeAviSviSchema))
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateOrangeAviSviDto,

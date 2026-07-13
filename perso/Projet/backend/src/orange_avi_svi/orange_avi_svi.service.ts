@@ -6,7 +6,7 @@ import { OrangeAviProfile } from '../orange_avi_profile/interfaces/orange_avi_pr
 import {
   CreateOrangeAviSviDto,
   UpdateOrangeAviSviDto,
-} from './orange_avi_svi.dto';
+} from './schemas/orange_avi_svi.schema';
 
 @Injectable()
 export class OrangeAviSviService {

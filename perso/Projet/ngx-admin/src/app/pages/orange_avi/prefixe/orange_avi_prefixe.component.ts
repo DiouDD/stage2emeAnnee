@@ -32,10 +32,7 @@ export class OrangeAviPrefixeComponent implements OnInit {
     this.loadProfiles();
   }
 
-  // Construit l'objet settings du tableau. La liste déroulante de la colonne "Profile"
-  // dépend de this.profiles : on doit reconstruire (et réassigner) settings à chaque
-  // changement de cette liste pour que ng2-smart-table reconstruise ses colonnes
-  // (une simple mutation en profondeur n'est pas détectée par le composant).
+
   private buildSettings(): any {
     return {
       add: {

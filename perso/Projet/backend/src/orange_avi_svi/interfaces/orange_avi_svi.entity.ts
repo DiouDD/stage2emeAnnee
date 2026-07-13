@@ -19,54 +19,104 @@ export class OrangeAviSvi {
   @JoinColumn({ name: 'id_profile' })
   profile!: OrangeAviProfile;
 
-  @Column({ name: 'menu_0_action', length: 50, nullable: true })
-  menu_0_action!: string;
+  @Column({
+    name: 'menu_0_action',
+    type: 'varchar',
+    length: 50,
+    nullable: true,
+  })
+  menu_0_action!: string | null;
 
-  @Column({ name: 'menu_0_ch', length: 50, nullable: true })
-  menu_0_ch!: string;
+  @Column({ name: 'menu_0_ch', type: 'varchar', length: 50, nullable: true })
+  menu_0_ch!: string | null;
 
-  @Column({ name: 'menu_1_action', length: 50, nullable: true })
-  menu_1_action!: string;
+  @Column({
+    name: 'menu_1_action',
+    type: 'varchar',
+    length: 50,
+    nullable: true,
+  })
+  menu_1_action!: string | null;
 
-  @Column({ name: 'menu_1_ch', length: 50, nullable: true })
-  menu_1_ch!: string;
+  @Column({ name: 'menu_1_ch', type: 'varchar', length: 50, nullable: true })
+  menu_1_ch!: string | null;
 
-  @Column({ name: 'menu_2_action', length: 50, nullable: true })
-  menu_2_action!: string;
+  @Column({
+    name: 'menu_2_action',
+    type: 'varchar',
+    length: 50,
+    nullable: true,
+  })
+  menu_2_action!: string | null;
 
-  @Column({ name: 'menu_2_ch', length: 50, nullable: true })
-  menu_2_ch!: string;
+  @Column({ name: 'menu_2_ch', type: 'varchar', length: 50, nullable: true })
+  menu_2_ch!: string | null;
 
-  @Column({ name: 'menu_3_action', length: 50, nullable: true })
-  menu_3_action!: string;
+  @Column({
+    name: 'menu_3_action',
+    type: 'varchar',
+    length: 50,
+    nullable: true,
+  })
+  menu_3_action!: string | null;
 
-  @Column({ name: 'menu_3_ch', length: 50, nullable: true })
-  menu_3_ch!: string;
+  @Column({ name: 'menu_3_ch', type: 'varchar', length: 50, nullable: true })
+  menu_3_ch!: string | null;
 
-  @Column({ name: 'menu_4_action', length: 50, nullable: true })
-  menu_4_action!: string;
+  @Column({
+    name: 'menu_4_action',
+    type: 'varchar',
+    length: 50,
+    nullable: true,
+  })
+  menu_4_action!: string | null;
 
-  @Column({ name: 'menu_4_ch', length: 50, nullable: true })
-  menu_4_ch!: string;
+  @Column({ name: 'menu_4_ch', type: 'varchar', length: 50, nullable: true })
+  menu_4_ch!: string | null;
 
-  @Column({ name: 'menu_5_action', length: 50, nullable: true })
-  menu_5_action!: string;
+  @Column({
+    name: 'menu_5_action',
+    type: 'varchar',
+    length: 50,
+    nullable: true,
+  })
+  menu_5_action!: string | null;
 
-  @Column({ name: 'menu_5_ch', length: 50, nullable: true })
-  menu_5_ch!: string;
+  @Column({ name: 'menu_5_ch', type: 'varchar', length: 50, nullable: true })
+  menu_5_ch!: string | null;
 
-  @Column({ name: 'menu_diese_action', length: 50, nullable: true })
-  menu_diese_action!: string;
+  @Column({
+    name: 'menu_diese_action',
+    type: 'varchar',
+    length: 50,
+    nullable: true,
+  })
+  menu_diese_action!: string | null;
 
-  @Column({ name: 'menu_diese_ch', length: 50, nullable: true })
-  menu_diese_ch!: string;
+  @Column({
+    name: 'menu_diese_ch',
+    type: 'varchar',
+    length: 50,
+    nullable: true,
+  })
+  menu_diese_ch!: string | null;
 
-  @Column({ name: 'menu_etoile_action', length: 50, nullable: true })
-  menu_etoile_action!: string;
+  @Column({
+    name: 'menu_etoile_action',
+    type: 'varchar',
+    length: 50,
+    nullable: true,
+  })
+  menu_etoile_action!: string | null;
 
-  @Column({ name: 'menu_etoile_ch', length: 50, nullable: true })
-  menu_etoile_ch!: string;
+  @Column({
+    name: 'menu_etoile_ch',
+    type: 'varchar',
+    length: 50,
+    nullable: true,
+  })
+  menu_etoile_ch!: string | null;
 
-  @Column({ name: 'audio_svi', length: 50, nullable: true })
-  audio_svi!: string;
+  @Column({ name: 'audio_svi', type: 'varchar', length: 50, nullable: true })
+  audio_svi!: string | null;
 }
