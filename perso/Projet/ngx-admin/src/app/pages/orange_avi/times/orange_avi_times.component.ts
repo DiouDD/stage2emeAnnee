@@ -307,6 +307,7 @@ export class OrangeAviTimesComponent implements OnInit {
     this.newExceptionClosing = '00:00';
   }
 
+  
   /**
    * Supprime une exception via son UID
    */

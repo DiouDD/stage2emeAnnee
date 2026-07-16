@@ -51,6 +51,20 @@
                         <input type="number" nbInput fullWidth [(ngModel)]="newSelectedProfile.waiting_time">
                     </div>
                 </div>
+                <div class="row align-items-center mb-3">
+                    <div class="col-sm-6">
+                        <nb-checkbox
+                            [checked]="sviActif"
+                            (checkedChange)="onSviActifChange($event)">
+                            Activer le SVI
+                        </nb-checkbox>
+                    </div>
+                    <div class="col-sm-6 text-right">
+                        <button nbButton outline status="info" size="small" [disabled]="!selectedProfile" (click)="onVoirSviClick()">
+                            Voir le SVI
+                        </button>
+                    </div>
+                </div>
                 <ngx-orange-avi-times [selectedProfileId]="selectedProfileId"></ngx-orange-avi-times>
             </div>
             <!-- Colonne de droite (Messages audio) -->

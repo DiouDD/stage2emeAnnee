@@ -499,6 +499,22 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
     this.isEditing = true;
   }
 
+  get sviActif(): boolean {
+    return !!this.newSelectedProfile?.menu_actif;
+  }
+
+  onSviActifChange(checked: boolean): void {
+    if (this.newSelectedProfile) {
+      this.newSelectedProfile.menu_actif = checked ? 1 : 0;
+    }
+    this.isEditing = true;
+  }
+
+  public onVoirSviClick(): void {
+    if (!this.selectedProfile) return;
+    // TODO: navigation vers la page SVI, à implémenter.
+  }
+
 
   // ==========================================
   // Actions de Navigation / Événements utilisateur
