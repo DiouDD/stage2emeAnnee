@@ -1,0 +1,139 @@
+import { Component, Input, OnInit } from '@angular/core';
+import { NbDialogRef } from '@nebular/theme';
+import { OrangeAviSviService } from './orange_avi_svi.service';
+import { OrangeAviSvi } from './orange_avi_svi.model';
+import { OrangeAviProfileService } from '../profile/orange_avi_profile.service';
+import { OrangeAviProfile } from '../profile/orange_avi_profile.model';
+
+interface SviMenuRow {
+  label: string;
+  actionField: keyof OrangeAviSvi;
+  chField: keyof OrangeAviSvi;
+}
+
+function emptySvi(): OrangeAviSvi {
+  return {
+    uid: 0,
+    menu_0_action: null,
+    menu_0_ch: null,
+    menu_1_action: null,
+    menu_1_ch: null,
+    menu_2_action: null,
+    menu_2_ch: null,
+    menu_3_action: null,
+    menu_3_ch: null,
+    menu_4_action: null,
+    menu_4_ch: null,
+    menu_5_action: null,
+    menu_5_ch: null,
+    menu_diese_action: null,
+    menu_diese_ch: null,
+    menu_etoile_action: null,
+    menu_etoile_ch: null,
+    audio_svi: null,
+  };
+}
+
+@Component({
+  selector: 'ngx-orange-avi-svi',
+  templateUrl: './orange_avi_svi.component.html',
+  styleUrls: ['./orange_avi_svi.component.scss']
+})
+export class OrangeAviSviComponent implements OnInit {
+
+  @Input() profile!: OrangeAviProfile;
+
+  svi: OrangeAviSvi = emptySvi();
+  audioOptions: string[] = [];
+  isSaving: boolean = false;
+
+  readonly menuRows: SviMenuRow[] = [
+    { label: '1', actionField: 'menu_1_action', chField: 'menu_1_ch' },
+    { label: '2', actionField: 'menu_2_action', chField: 'menu_2_ch' },
+    { label: '3', actionField: 'menu_3_action', chField: 'menu_3_ch' },
+    { label: '4', actionField: 'menu_4_action', chField: 'menu_4_ch' },
+    { label: '5', actionField: 'menu_5_action', chField: 'menu_5_ch' },
+    { label: '0', actionField: 'menu_0_action', chField: 'menu_0_ch' },
+    { label: '#', actionField: 'menu_diese_action', chField: 'menu_diese_ch' },
+    { label: '*', actionField: 'menu_etoile_action', chField: 'menu_etoile_ch' },
+  ];
+
+  constructor(
+    protected dialogRef: NbDialogRef<OrangeAviSviComponent>,
+    private oasviService: OrangeAviSviService,
+    private oapService: OrangeAviProfileService,
+  ) {}
+
+  ngOnInit(): void {
+    this.oapService.getAudioOptions().subscribe(data => {
+      this.audioOptions = data;
+    });
+    this.loadSvi();
+  }
+
+  private loadSvi(): void {
+    if (!this.profile) return;
+    this.oasviService.getOasvisByProfile(this.profile.uid).subscribe({
+      next: (data) => {
+        this.svi = data.length > 0 ? data[0] : emptySvi();
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement du SVI :', err);
+        this.svi = emptySvi();
+      }
+    });
+  }
+
+  getField(field: keyof OrangeAviSvi): string | null {
+    const value = this.svi[field];
+    return value == null ? null : String(value);
+  }
+
+  setField(field: keyof OrangeAviSvi, value: string): void {
+    (this.svi as any)[field] = value === '' ? null : value;
+  }
+
+  onClearRow(row: SviMenuRow): void {
+    (this.svi as any)[row.actionField] = null;
+    (this.svi as any)[row.chField] = null;
+  }
+
+  onApply(): void {
+    if (!this.profile) return;
+
+    const { profile, uid, ...rest } = this.svi;
+    const payload = { ...rest, profileUid: this.profile.uid } as OrangeAviSvi;
+
+    this.isSaving = true;
+
+    if (this.svi.uid) {
+      this.oasviService.updateOasvi(this.svi.uid, payload).subscribe({
+        next: (updated) => {
+          this.svi = updated;
+          this.isSaving = false;
+        },
+        error: (err) => {
+          console.error('Erreur lors de la mise à jour du SVI :', err);
+          alert("Erreur lors de l'enregistrement du SVI.");
+          this.isSaving = false;
+        }
+      });
+    } else {
+      this.oasviService.addOasvi(payload).subscribe({
+        next: (created) => {
+          this.svi = created;
+          this.isSaving = false;
+        },
+        error: (err) => {
+          console.error("Erreur lors de la création du SVI :", err);
+          alert("Erreur lors de l'enregistrement du SVI.");
+          this.isSaving = false;
+        }
+      });
+    }
+  }
+
+  onRetour(): void {
+    this.dialogRef.close();
+  }
+}

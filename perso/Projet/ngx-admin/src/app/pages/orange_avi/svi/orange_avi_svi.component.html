@@ -1,0 +1,57 @@
+<nb-card class="svi-dialog">
+    <nb-card-header>
+        <div class="row align-items-center">
+            <div class="col-4">
+                <button nbButton outline status="basic" size="small" (click)="onRetour()">Retour</button>
+            </div>
+            <div class="col-8 text-right">
+                <span class="label">Profil : {{ profile?.profile }}</span>
+            </div>
+        </div>
+    </nb-card-header>
+    <nb-card-body>
+        <h5 class="text-center mb-4">SVI Principal</h5>
+
+        <div class="row align-items-center mb-4">
+            <label class="label col-sm-2">Message :</label>
+            <div class="col-sm-10">
+                <nb-select fullWidth [(ngModel)]="svi.audio_svi">
+                    <nb-option [value]="null">Aucun</nb-option>
+                    <nb-option *ngFor="let audio of audioOptions" [value]="audio">
+                        {{ audio }}
+                    </nb-option>
+                </nb-select>
+            </div>
+        </div>
+
+        <div class="row align-items-center mb-2" *ngFor="let row of menuRows">
+            <div class="col-sm-1 text-center">
+                <button nbButton ghost status="danger" size="tiny" (click)="onClearRow(row)" title="Effacer cette touche">
+                    <nb-icon icon="close-outline"></nb-icon>
+                </button>
+            </div>
+            <div class="col-sm-1 text-center">
+                <strong>{{ row.label }}</strong>
+            </div>
+            <div class="col-sm-5">
+                <input type="text" nbInput fullWidth fieldSize="small"
+                    placeholder="Action"
+                    [ngModel]="getField(row.actionField)"
+                    (ngModelChange)="setField(row.actionField, $event)">
+            </div>
+            <div class="col-sm-5">
+                <input type="text" nbInput fullWidth fieldSize="small"
+                    placeholder="Ch"
+                    [ngModel]="getField(row.chField)"
+                    (ngModelChange)="setField(row.chField, $event)">
+            </div>
+        </div>
+    </nb-card-body>
+    <nb-card-footer>
+        <div class="row">
+            <div class="col text-right">
+                <button nbButton status="primary" [disabled]="isSaving" (click)="onApply()">Appliquer</button>
+            </div>
+        </div>
+    </nb-card-footer>
+</nb-card>

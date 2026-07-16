@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Ng2SmartTableModule } from 'ng2-smart-table';
-import { NbCardModule, NbButtonModule, NbIconModule } from '@nebular/theme';
+import { NbCardModule, NbButtonModule, NbIconModule, NbDialogModule } from '@nebular/theme';
 import { OrangeAviPrefixeComponent } from './prefixe/orange_avi_prefixe.component';
 import { OrangeAviComponent } from './orange_avi.component';
 import { OrangeAviProfileComponent } from './profile/orange_avi_profile.component';
@@ -10,6 +10,7 @@ import { NbSelectModule } from '@nebular/theme';
 import { NbCheckboxModule } from '@nebular/theme';
 import { NbDatepickerModule } from '@nebular/theme';
 import { OrangeAviTimesComponent } from './times/orange_avi_times.component';
+import { OrangeAviSviComponent } from './svi/orange_avi_svi.component';
 import { FormsModule } from '@angular/forms';
 import { SharedModule } from '../../shared/pipes/aucun.pipe.spec';
 import { Ng2CompleterModule } from "ng2-completer";
@@ -24,6 +25,7 @@ import { Ng2CompleterModule } from "ng2-completer";
     NbSelectModule,
     NbCheckboxModule,
     NbDatepickerModule,
+    NbDialogModule,
     SharedModule,
     NbButtonModule,
     NbIconModule,
@@ -34,8 +36,9 @@ import { Ng2CompleterModule } from "ng2-completer";
     OrangeAviPrefixeComponent,
     OrangeAviProfileComponent,
     OrangeAviComponent,
-    OrangeAviTimesComponent
+    OrangeAviTimesComponent,
+    OrangeAviSviComponent
   ],
-  
+
 })
 export class OrangeAviModule { }

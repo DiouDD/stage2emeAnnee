@@ -1,11 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { LocalDataSource } from 'ng2-smart-table';
+import { NbDialogService } from '@nebular/theme';
 import { OrangeAviProfileService } from './orange_avi_profile.service';
 import { ProfileStateService } from './profile_state.service';
 import { OrangeAviProfile, OrangeAviProfileSchema } from './orange_avi_profile.model';
 import { OrangeAviTimesService } from '../times/orange_avi_times.service';
 import { OrangeAviTimes } from '../times/orange_avi_times.model';
+import { OrangeAviSviComponent } from '../svi/orange_avi_svi.component';
 
 @Component({
   selector: 'ngx-orange-avi-profile',
@@ -38,7 +40,8 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
   constructor(
     private oapService: OrangeAviProfileService,
     private oatService: OrangeAviTimesService,
-    private profileStateService: ProfileStateService
+    private profileStateService: ProfileStateService,
+    private dialogService: NbDialogService
   ) {}
 
   /**
@@ -512,7 +515,13 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
 
   public onVoirSviClick(): void {
     if (!this.selectedProfile) return;
-    // TODO: navigation vers la page SVI, à implémenter.
+    this.dialogService.open(OrangeAviSviComponent, {
+      context: {
+        profile: this.selectedProfile,
+      },
+      closeOnBackdropClick: true,
+      closeOnEsc: true,
+    });
   }
 
 
