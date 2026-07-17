@@ -16,7 +16,7 @@
             <label class="label col-sm-2">Message :</label>
             <div class="col-sm-10">
                 <nb-select fullWidth [(ngModel)]="svi.audio_svi">
-                    <nb-option [value]="null">Aucun</nb-option>
+                    <nb-option [value]="'Aucun'">Aucun</nb-option>
                     <nb-option *ngFor="let audio of audioOptions" [value]="audio">
                         {{ audio }}
                     </nb-option>

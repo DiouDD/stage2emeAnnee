@@ -38,7 +38,7 @@
                         <nb-select 
                             [(ngModel)]="newSelectedProfile.audio_welcome"
                             >
-                            <nb-option [value]="null">Aucun</nb-option>
+                            <nb-option [value]="'Aucun'">Aucun</nb-option>
                             <nb-option *ngFor="let audio of audioOptions" [value]="audio"> 
                                 {{ audio | aucun }}
                             </nb-option>
@@ -74,7 +74,7 @@
                   <nb-select fullWidth
                           [(ngModel)]="newSelectedProfile.barrage_entrant"
                           (selectedChange)="onBarrageChange($event)">
-                          <nb-option [value]="null">Aucun</nb-option>
+                          <nb-option [value]="'Aucun'">Aucun</nb-option>
                           <nb-option *ngFor="let audio of audioOptions" [value]="audio">
                               {{ audio | aucun }}
                           </nb-option>
@@ -85,7 +85,7 @@
                     <nb-select fullWidth selected="attente"
                             [(ngModel)]="newSelectedProfile.audio_waiting"
                             (selectedChange)="onAudioWaitingChange($event)">
-                            <nb-option [value]="null">Aucun</nb-option>
+                            <nb-option [value]="'Aucun'">Aucun</nb-option>
                             <nb-option *ngFor="let audio of audioOptions" [value]="audio"> 
                                 {{ audio | aucun }}
                             </nb-option>
@@ -96,7 +96,7 @@
                     <nb-select fullWidth selected="dissuasion"
                             [(ngModel)]="newSelectedProfile.audio_dissuasion"
                             (selectedChange)="onAudioDissuasionChange($event)">
-                            <nb-option [value]="null">Aucun</nb-option>
+                            <nb-option [value]="'Aucun'">Aucun</nb-option>
                             <nb-option *ngFor="let audio of audioOptions" [value]="audio"> 
                                 {{ audio | aucun }}
                             </nb-option>
@@ -107,7 +107,7 @@
                     <nb-select fullWidth selected="fermeture"
                             [(ngModel)]="newSelectedProfile.audio_closing"
                             (selectedChange)="onAudioClosingChange($event)">
-                            <nb-option [value]="null">Aucun</nb-option>
+                            <nb-option [value]="'Aucun'">Aucun</nb-option>
                             <nb-option *ngFor="let audio of audioOptions" [value]="audio"> 
                                 {{ audio | aucun }}
                             </nb-option>
@@ -118,7 +118,7 @@
                     <nb-select fullWidth selected="fermeture exceptionnelle"
                             [(ngModel)]="newSelectedProfile.audio_exceptionnel"
                             (selectedChange)="onAudioExceptChange($event)">
-                            <nb-option [value]="null">Aucun</nb-option>
+                            <nb-option [value]="'Aucun'">Aucun</nb-option>
                             <nb-option *ngFor="let audio of audioOptions" [value]="audio"> 
                                 {{ audio | aucun }}
                             </nb-option>
@@ -129,7 +129,7 @@
                      <nb-select fullWidth selected="aucun"
                             [(ngModel)]="newSelectedProfile.audio_flash"
                             (selectedChange)="onAudioFlashChange($event)">
-                            <nb-option [value]="null">Aucun</nb-option>
+                            <nb-option [value]="'Aucun'">Aucun</nb-option>
                             <nb-option *ngFor="let audio of audioOptions" [value]="audio"> 
                                 {{ audio | aucun }}
                             </nb-option>

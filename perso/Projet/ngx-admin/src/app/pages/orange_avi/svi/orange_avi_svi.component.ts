@@ -30,7 +30,7 @@ function emptySvi(): OrangeAviSvi {
     menu_diese_ch: null,
     menu_etoile_action: null,
     menu_etoile_ch: null,
-    audio_svi: null,
+    audio_svi: 'Aucun',
   };
 }
 
@@ -76,6 +76,9 @@ export class OrangeAviSviComponent implements OnInit {
     this.oasviService.getOasvisByProfile(this.profile.uid).subscribe({
       next: (data) => {
         this.svi = data.length > 0 ? data[0] : emptySvi();
+        if (!this.svi.audio_svi) {
+          this.svi.audio_svi = 'Aucun';
+        }
       },
       error: (err) => {
         console.error('Erreur lors du chargement du SVI :', err);
@@ -121,7 +124,7 @@ export class OrangeAviSviComponent implements OnInit {
     } else {
       this.oasviService.addOasvi(payload).subscribe({
         next: (created) => {
-          this.svi = created;
+          this.svi = created;1
           this.isSaving = false;
         },
         error: (err) => {

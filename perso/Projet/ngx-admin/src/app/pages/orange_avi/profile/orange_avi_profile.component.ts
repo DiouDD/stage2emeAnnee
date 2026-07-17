@@ -179,15 +179,15 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
       // (Adaptez ces valeurs par défaut selon les contraintes de votre base de données)
       newData.waiting_time = 0;
       newData.menu_actif = 0;
-      newData.audio_welcome = '';
-      newData.audio_waiting = '';
-      newData.audio_dissuasion = '';
-      newData.audio_closing = '';
-      newData.audio_flash = '';
-      newData.audio_exceptionnel = '';
+      newData.audio_welcome = 'Aucun';
+      newData.audio_waiting = 'Aucun';
+      newData.audio_dissuasion = 'Aucun';
+      newData.audio_closing = 'Aucun';
+      newData.audio_flash = 'Aucun';
+      newData.audio_exceptionnel = 'Aucun';
       newData.type_dissuasion = '';
       newData.ch1_dissuasion = '';
-      newData.barrage_entrant = '';
+      newData.barrage_entrant = 'Aucun';
 
       // 3. Validation des données complétées avec votre schéma Zod
       const result = OrangeAviProfileSchema.safeParse(newData);
@@ -272,16 +272,16 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
       profile: this.newSelectedProfile.profile.trim(),
       description: this.newSelectedProfile.description ?? '',
       waiting_time: this.newSelectedProfile.waiting_time ?? 0,
-      audio_welcome: this.newSelectedProfile.audio_welcome ?? '',
-      audio_waiting: this.newSelectedProfile.audio_waiting ?? '',
-      audio_dissuasion: this.newSelectedProfile.audio_dissuasion ?? '',
-      audio_closing: this.newSelectedProfile.audio_closing ?? '',
-      audio_flash: this.newSelectedProfile.audio_flash ?? '',
-      audio_exceptionnel: this.newSelectedProfile.audio_exceptionnel ?? '',
+      audio_welcome: this.newSelectedProfile.audio_welcome || 'Aucun',
+      audio_waiting: this.newSelectedProfile.audio_waiting || 'Aucun',
+      audio_dissuasion: this.newSelectedProfile.audio_dissuasion || 'Aucun',
+      audio_closing: this.newSelectedProfile.audio_closing || 'Aucun',
+      audio_flash: this.newSelectedProfile.audio_flash || 'Aucun',
+      audio_exceptionnel: this.newSelectedProfile.audio_exceptionnel || 'Aucun',
       type_dissuasion: this.newSelectedProfile.type_dissuasion ?? '',
       ch1_dissuasion: this.newSelectedProfile.ch1_dissuasion ?? '',
       menu_actif: this.newSelectedProfile.menu_actif ?? 0,
-      barrage_entrant: this.newSelectedProfile.barrage_entrant ?? '',
+      barrage_entrant: this.newSelectedProfile.barrage_entrant || 'Aucun',
     };
 
     const result = OrangeAviProfileSchema.safeParse(dataToValidate);
@@ -358,16 +358,16 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
       profile: `${this.selectedProfile.profile}_copy`,
       description: this.selectedProfile.description ?? '',
       waiting_time: this.selectedProfile.waiting_time ?? 0,
-      audio_welcome: this.selectedProfile.audio_welcome ?? '',
-      audio_waiting: this.selectedProfile.audio_waiting ?? '',
-      audio_dissuasion: this.selectedProfile.audio_dissuasion ?? '',
-      audio_closing: this.selectedProfile.audio_closing ?? '',
-      audio_flash: this.selectedProfile.audio_flash ?? '',
-      audio_exceptionnel: this.selectedProfile.audio_exceptionnel ?? '',
+      audio_welcome: this.selectedProfile.audio_welcome || 'Aucun',
+      audio_waiting: this.selectedProfile.audio_waiting || 'Aucun',
+      audio_dissuasion: this.selectedProfile.audio_dissuasion || 'Aucun',
+      audio_closing: this.selectedProfile.audio_closing || 'Aucun',
+      audio_flash: this.selectedProfile.audio_flash || 'Aucun',
+      audio_exceptionnel: this.selectedProfile.audio_exceptionnel || 'Aucun',
       type_dissuasion: this.selectedProfile.type_dissuasion ?? '',
       ch1_dissuasion: this.selectedProfile.ch1_dissuasion ?? '',
       menu_actif: this.selectedProfile.menu_actif ?? 0,
-      barrage_entrant: this.selectedProfile.barrage_entrant ?? '',
+      barrage_entrant: this.selectedProfile.barrage_entrant || 'Aucun',
     };
 
     const result = OrangeAviProfileSchema.safeParse(duplicatedProfile);
