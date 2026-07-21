@@ -1,5 +1,11 @@
 .svi-dialog {
-  min-width: 500px;
-  max-width: 600px;
+  min-width: 900px;
+  max-width: 1100px;
   margin: 0;
+}
+
+.svi-column {
+  &:first-child {
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+  }
 }

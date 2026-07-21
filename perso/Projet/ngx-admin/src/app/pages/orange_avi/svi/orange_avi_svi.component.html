@@ -10,40 +10,83 @@
         </div>
     </nb-card-header>
     <nb-card-body>
-        <h5 class="text-center mb-4">SVI Principal</h5>
+        <div class="row">
+            <div class="col-6 svi-column">
+                <h5 class="text-center mb-4">SVI Principal</h5>
 
-        <div class="row align-items-center mb-4">
-            <label class="label col-sm-2">Message :</label>
-            <div class="col-sm-10">
-                <nb-select fullWidth [(ngModel)]="svi.audio_svi">
-                    <nb-option [value]="'Aucun'">Aucun</nb-option>
-                    <nb-option *ngFor="let audio of audioOptions" [value]="audio">
-                        {{ audio }}
-                    </nb-option>
-                </nb-select>
-            </div>
-        </div>
+                <div class="row align-items-center mb-4">
+                    <label class="label col-sm-3">Message :</label>
+                    <div class="col-sm-9">
+                        <nb-select fullWidth [(ngModel)]="svi.audio_svi">
+                            <nb-option [value]="'Aucun'">Aucun</nb-option>
+                            <nb-option *ngFor="let audio of audioOptions" [value]="audio">
+                                {{ audio }}
+                            </nb-option>
+                        </nb-select>
+                    </div>
+                </div>
 
-        <div class="row align-items-center mb-2" *ngFor="let row of menuRows">
-            <div class="col-sm-1 text-center">
-                <button nbButton ghost status="danger" size="tiny" (click)="onClearRow(row)" title="Effacer cette touche">
-                    <nb-icon icon="close-outline"></nb-icon>
-                </button>
+                <div class="row align-items-center mb-2" *ngFor="let row of menuRows">
+                    <div class="col-sm-2 text-center">
+                        <button nbButton ghost status="danger" size="tiny" (click)="onClearRow(row)" title="Effacer cette touche">
+                            <nb-icon icon="close-outline"></nb-icon>
+                        </button>
+                    </div>
+                    <div class="col-sm-1 text-center">
+                        <strong>{{ row.label }}</strong>
+                    </div>
+                    <div class="col-sm-4">
+                        <input type="text" nbInput fullWidth fieldSize="small"
+                            placeholder="Action"
+                            [ngModel]="getField(row.actionField)"
+                            (ngModelChange)="setField(row.actionField, $event)">
+                    </div>
+                    <div class="col-sm-5">
+                        <input type="text" nbInput fullWidth fieldSize="small"
+                            placeholder="Ch"
+                            [ngModel]="getField(row.chField)"
+                            (ngModelChange)="setField(row.chField, $event)">
+                    </div>
+                </div>
             </div>
-            <div class="col-sm-1 text-center">
-                <strong>{{ row.label }}</strong>
-            </div>
-            <div class="col-sm-5">
-                <input type="text" nbInput fullWidth fieldSize="small"
-                    placeholder="Action"
-                    [ngModel]="getField(row.actionField)"
-                    (ngModelChange)="setField(row.actionField, $event)">
-            </div>
-            <div class="col-sm-5">
-                <input type="text" nbInput fullWidth fieldSize="small"
-                    placeholder="Ch"
-                    [ngModel]="getField(row.chField)"
-                    (ngModelChange)="setField(row.chField, $event)">
+
+            <div class="col-6 svi-column">
+                <h5 class="text-center mb-4">SVI Secondaire</h5>
+
+                <div class="row align-items-center mb-4">
+                    <label class="label col-sm-3">Message :</label>
+                    <div class="col-sm-9">
+                        <nb-select fullWidth [(ngModel)]="svi2.audio_svi">
+                            <nb-option [value]="'Aucun'">Aucun</nb-option>
+                            <nb-option *ngFor="let audio of audioOptions" [value]="audio">
+                                {{ audio }}
+                            </nb-option>
+                        </nb-select>
+                    </div>
+                </div>
+
+                <div class="row align-items-center mb-2" *ngFor="let row of menuRows2">
+                    <div class="col-sm-2 text-center">
+                        <button nbButton ghost status="danger" size="tiny" (click)="onClearRow2(row)" title="Effacer cette touche">
+                            <nb-icon icon="close-outline"></nb-icon>
+                        </button>
+                    </div>
+                    <div class="col-sm-1 text-center">
+                        <strong>{{ row.label }}</strong>
+                    </div>
+                    <div class="col-sm-4">
+                        <input type="text" nbInput fullWidth fieldSize="small"
+                            placeholder="Action"
+                            [ngModel]="getField2(row.actionField)"
+                            (ngModelChange)="setField2(row.actionField, $event)">
+                    </div>
+                    <div class="col-sm-5">
+                        <input type="text" nbInput fullWidth fieldSize="small"
+                            placeholder="Ch"
+                            [ngModel]="getField2(row.chField)"
+                            (ngModelChange)="setField2(row.chField, $event)">
+                    </div>
+                </div>
             </div>
         </div>
     </nb-card-body>
