@@ -10,6 +10,8 @@ import { OrangeAviTimes } from './orange_avi_times/interfaces/orange_avi_times.e
 import { OrangeAviTimesModule } from './orange_avi_times/orange_avi_times.module';
 import { OrangeAviSvi } from './orange_avi_svi/interfaces/orange_avi_svi.entity';
 import { OrangeAviSviModule } from './orange_avi_svi/orange_avi_svi.module';
+import { OrangeAviSvi2 } from './orange_avi_svi2/interfaces/orange_avi_svi2.entity';
+import { OrangeAviSvi2Module } from './orange_avi_svi2/orange_avi_svi2.module';
 
 @Module({
   imports: [
@@ -25,6 +27,7 @@ import { OrangeAviSviModule } from './orange_avi_svi/orange_avi_svi.module';
         OrangeAviProfile,
         OrangeAviTimes,
         OrangeAviSvi,
+        OrangeAviSvi2,
       ], // Ajoutez votre entité ici aussi si vous n'utilisez pas d'auto-load
       synchronize: true, // /!\ À désactiver en production, pratique en développement
     }),
@@ -32,6 +35,7 @@ import { OrangeAviSviModule } from './orange_avi_svi/orange_avi_svi.module';
     OrangeAviProfileModule,
     OrangeAviTimesModule,
     OrangeAviSviModule,
+    OrangeAviSvi2Module,
   ],
   controllers: [AppController],
   providers: [AppService],

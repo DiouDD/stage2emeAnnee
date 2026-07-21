@@ -3,6 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { OrangeAviPrefixe } from 'src/orange_avi_prefixe/interfaces/orange_avi_prefixe.entity';
 import { OrangeAviTimes } from 'src/orange_avi_times/interfaces/orange_avi_times.entity';
 import { OrangeAviSvi } from 'src/orange_avi_svi/interfaces/orange_avi_svi.entity';
+import { OrangeAviSvi2 } from 'src/orange_avi_svi2/interfaces/orange_avi_svi2.entity';
 
 @Entity({ name: 'orange_avi_profile' })
 export class OrangeAviProfile {
@@ -17,6 +18,9 @@ export class OrangeAviProfile {
 
   @OneToMany(() => OrangeAviSvi, (svi) => svi.profile)
   svis!: OrangeAviSvi[];
+
+  @OneToMany(() => OrangeAviSvi2, (svi) => svi.profile)
+  svis2!: OrangeAviSvi2[];
 
   @Column({ name: 'profile', length: 50 })
   profile!: string;
