@@ -502,6 +502,17 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
     this.isEditing = true;
   }
 
+  onTypeDissuasionChange(typeDissuasion: string): void {
+    if (this.selectedProfile && this.newSelectedProfile) {
+      this.newSelectedProfile.type_dissuasion = typeDissuasion;
+    }
+    this.isEditing = true;
+  }
+
+  onCh1DissuasionChange(): void {
+    this.isEditing = true;
+  }
+
   get sviActif(): boolean {
     return !!this.newSelectedProfile?.menu_actif;
   }
