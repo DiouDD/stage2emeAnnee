@@ -1,14 +1,21 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, from } from 'rxjs';
+import { shareReplay } from 'rxjs/operators';
 import { OrangeAviProfile } from './orange_avi_profile.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class OrangeAviProfileService {  
+export class OrangeAviProfileService {
   private apiUrl = "http://localhost:3000/oapros";
+  private filesUrl = "http://localhost:3000/files";
+
+  /** Nom du Cache Storage (navigateur) utilisé pour persister la liste des fichiers. */
+  private readonly FILES_CACHE_NAME = 'oap-files-cache';
+
+  /** Cache en mémoire de l'Observable, pour ne déclencher qu'une seule lecture/écriture du Cache Storage par session. */
+  private filesCache$: Observable<string[]> | null = null;
 
   constructor(private http: HttpClient){}
 
@@ -37,22 +44,42 @@ export class OrangeAviProfileService {
     return this.http.post<OrangeAviProfile>(`${this.apiUrl}/${uid}/duplicate`, {});
   }
 
+  /**
+   * Récupère la liste de tous les fichiers audio disponibles côté serveur (endpoint /files)
+   * et la stocke dans le Cache Storage du navigateur (celui visible dans DevTools > Application >
+   * Cache Storage), pour que la donnée persiste même après un rechargement de page (F5) sans
+   * refaire de requête réseau.
+   */
+  getFiles(): Observable<string[]> {
+    if (!this.filesCache$) {
+      this.filesCache$ = from(this.fetchFilesWithCacheStorage()).pipe(
+        shareReplay(1)
+      );
+    }
+    return this.filesCache$;
+  }
+
+  /** Vide le Cache Storage des fichiers (ex: après ajout d'un nouveau fichier audio côté serveur). */
+  async clearFilesCache(): Promise<void> {
+    this.filesCache$ = null;
+    const cache = await caches.open(this.FILES_CACHE_NAME);
+    await cache.delete(this.filesUrl);
+  }
+
+  private async fetchFilesWithCacheStorage(): Promise<string[]> {
+    const cache = await caches.open(this.FILES_CACHE_NAME);
+
+    const cachedResponse = await cache.match(this.filesUrl);
+    if (cachedResponse) {
+      return cachedResponse.json();
+    }
+
+    const response = await fetch(this.filesUrl);
+    await cache.put(this.filesUrl, response.clone());
+    return response.json();
+  }
+
   getAudioOptions(): Observable<string[]> {
-    return this.getOaps().pipe(
-      map(profiles => {
-        const allAudios = new Set<string>();
-        
-        profiles.forEach(profile => {
-          if (profile.audio_welcome) allAudios.add(profile.audio_welcome);
-          if (profile.audio_waiting) allAudios.add(profile.audio_waiting);
-          if (profile.audio_dissuasion) allAudios.add(profile.audio_dissuasion);
-          if (profile.audio_closing) allAudios.add(profile.audio_closing);
-          if (profile.audio_flash) allAudios.add(profile.audio_flash);
-          if (profile.audio_exceptionnel) allAudios.add(profile.audio_exceptionnel);
-        });
-        
-        return Array.from(allAudios).sort();
-      })
-    );
+    return this.getFiles();
   }
 }
