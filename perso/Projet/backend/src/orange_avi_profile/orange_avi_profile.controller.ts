@@ -45,6 +45,13 @@ export class OrangeAviProfileController {
     return this.oapsService.create(client);
   }
 
+  @Post(':id/duplicate')
+  duplicate(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<OrangeAviProfile> {
+    return this.oapsService.duplicate(id);
+  }
+
   @Put(':id')
   @UsePipes(new ZodValidationPipe(updateOrangeAviProfileSchema))
   update(

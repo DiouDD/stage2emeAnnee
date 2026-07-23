@@ -33,6 +33,10 @@ export class OrangeAviProfileService {
     return this.http.delete<void>(`${this.apiUrl}/${uid}`);
   }
 
+  duplicateOap(uid: number): Observable<OrangeAviProfile> {
+    return this.http.post<OrangeAviProfile>(`${this.apiUrl}/${uid}/duplicate`, {});
+  }
+
   getAudioOptions(): Observable<string[]> {
     return this.getOaps().pipe(
       map(profiles => {

@@ -5,8 +5,6 @@ import { NbDialogService } from '@nebular/theme';
 import { OrangeAviProfileService } from './orange_avi_profile.service';
 import { ProfileStateService } from './profile_state.service';
 import { OrangeAviProfile, OrangeAviProfileSchema } from './orange_avi_profile.model';
-import { OrangeAviTimesService } from '../times/orange_avi_times.service';
-import { OrangeAviTimes } from '../times/orange_avi_times.model';
 import { OrangeAviSviComponent } from '../svi/orange_avi_svi.component';
 
 @Component({
@@ -39,7 +37,6 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
 
   constructor(
     private oapService: OrangeAviProfileService,
-    private oatService: OrangeAviTimesService,
     private profileStateService: ProfileStateService,
     private dialogService: NbDialogService
   ) {}
@@ -344,92 +341,18 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
 
   /**
    * Duplique le profil actuellement sélectionné (nom + "_copy") ainsi que tous ses horaires.
+   * La duplication est faite en une seule requête côté serveur (profil + horaires
+   * créés ensemble), plutôt qu'en plusieurs appels HTTP successifs depuis le client.
    */
   public onDuplicateClick(): void {
     if (!this.selectedProfile) return;
 
-    const maxUid = this.profiles.length > 0
-      ? Math.max(...this.profiles.map(p => Number(p.uid)))
-      : 0;
-
-    const duplicatedProfile = {
-      ...this.selectedProfile,
-      uid: maxUid + 1,
-      profile: `${this.selectedProfile.profile}_copy`,
-      description: this.selectedProfile.description ?? '',
-      waiting_time: this.selectedProfile.waiting_time ?? 0,
-      audio_welcome: this.selectedProfile.audio_welcome || 'Aucun',
-      audio_waiting: this.selectedProfile.audio_waiting || 'Aucun',
-      audio_dissuasion: this.selectedProfile.audio_dissuasion || 'Aucun',
-      audio_closing: this.selectedProfile.audio_closing || 'Aucun',
-      audio_flash: this.selectedProfile.audio_flash || 'Aucun',
-      audio_exceptionnel: this.selectedProfile.audio_exceptionnel || 'Aucun',
-      type_dissuasion: this.selectedProfile.type_dissuasion ?? '',
-      ch1_dissuasion: this.selectedProfile.ch1_dissuasion ?? '',
-      menu_actif: this.selectedProfile.menu_actif ?? 0,
-      barrage_entrant: this.selectedProfile.barrage_entrant || 'Aucun',
-    };
-
-    const result = OrangeAviProfileSchema.safeParse(duplicatedProfile);
-
-    if (!result.success) {
-      console.error("Erreurs de validation Zod :", result.error.format());
-      alert("Données invalides. Impossible de dupliquer le profil.");
-      return;
-    }
-
-    const originalProfileUid = this.selectedProfile.uid;
-
-    this.oapService.addOap(result.data).subscribe({
-      next: (createdProfile) => {
-        this.oatService.getOatsById(originalProfileUid).subscribe({
-          next: (times) => {
-            const timesToDuplicate = Array.isArray(times) ? times : (times ? [times] : []);
-            this.duplicateTimesForProfile(timesToDuplicate, createdProfile.uid, () => this.finishDuplication(createdProfile));
-          },
-          error: (err) => {
-            console.error("Erreur lors de la récupération des horaires à dupliquer :", err);
-            this.finishDuplication(createdProfile);
-          }
-        });
-      },
+    this.oapService.duplicateOap(this.selectedProfile.uid).subscribe({
+      next: (createdProfile) => this.finishDuplication(createdProfile),
       error: (err) => {
         console.error("Erreur lors de la duplication du profil :", err);
         alert("Erreur lors de la duplication du profil.");
       }
-    });
-  }
-
-  /**
-   * Recrée, pour le nouveau profil, chacun des horaires du profil d'origine.
-   */
-  private duplicateTimesForProfile(times: OrangeAviTimes[], newProfileUid: number, onDone: () => void): void {
-    if (times.length === 0) {
-      onDone();
-      return;
-    }
-
-    let remaining = times.length;
-    times.forEach(time => {
-      const newTime = {
-        profileUid: newProfileUid,
-        day: time.day,
-        dow: time.dow,
-        opening_time: time.opening_time,
-        closing_time: time.closing_time,
-      };
-
-      this.oatService.addOat(newTime as any).subscribe({
-        next: () => {
-          remaining--;
-          if (remaining === 0) onDone();
-        },
-        error: (err) => {
-          console.error("Erreur lors de la duplication d'un horaire :", err);
-          remaining--;
-          if (remaining === 0) onDone();
-        }
-      });
     });
   }
 

@@ -12,6 +12,7 @@ import { OrangeAviSvi } from './orange_avi_svi/interfaces/orange_avi_svi.entity'
 import { OrangeAviSviModule } from './orange_avi_svi/orange_avi_svi.module';
 import { OrangeAviSvi2 } from './orange_avi_svi2/interfaces/orange_avi_svi2.entity';
 import { OrangeAviSvi2Module } from './orange_avi_svi2/orange_avi_svi2.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { OrangeAviSvi2Module } from './orange_avi_svi2/orange_avi_svi2.module';
     OrangeAviTimesModule,
     OrangeAviSviModule,
     OrangeAviSvi2Module,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
