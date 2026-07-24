@@ -391,9 +391,18 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
 
   /** Recharge la liste des profils, notifie les autres vues, puis sélectionne le profil dupliqué. */
   private finishDuplication(createdProfile: OrangeAviProfile): void {
-    this.loadOrangeAviProfiles();
-    this.profileStateService.notifyProfilesChanged();
-    this.selectProfileByUid(createdProfile.uid);
+    this.oapService.getOaps().subscribe({
+      next: (data) => {
+        this.source.load(data);
+        this.profiles = data;
+        this.profileStateService.notifyProfilesChanged();
+        // Le rechargement est terminé : le profil dupliqué est bien dans `this.profiles`, on peut le sélectionner.
+        this.selectProfileByUid(createdProfile.uid);
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement des profils :', err);
+      }
+    });
   }
 
   // ==========================================

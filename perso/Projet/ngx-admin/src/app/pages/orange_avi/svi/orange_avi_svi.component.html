@@ -36,10 +36,14 @@
                         <strong>{{ row.label }}</strong>
                     </div>
                     <div class="col-sm-4">
-                        <input type="text" nbInput fullWidth fieldSize="small"
-                            placeholder="Action"
+                        <nb-select fullWidth size="small" placeholder="Action"
                             [ngModel]="getField(row.actionField)"
                             (ngModelChange)="setField(row.actionField, $event)">
+                            <nb-option [value]="''">Aucune</nb-option>
+                            <nb-option *ngFor="let action of actionOptionsFor(row.actionField)" [value]="action">
+                                {{ action }}
+                            </nb-option>
+                        </nb-select>
                     </div>
                     <div class="col-sm-5">
                         <input type="text" nbInput fullWidth fieldSize="small"
@@ -75,10 +79,14 @@
                         <strong>{{ row.label }}</strong>
                     </div>
                     <div class="col-sm-4">
-                        <input type="text" nbInput fullWidth fieldSize="small"
-                            placeholder="Action"
+                        <nb-select fullWidth size="small" placeholder="Action"
                             [ngModel]="getField2(row.actionField)"
                             (ngModelChange)="setField2(row.actionField, $event)">
+                            <nb-option [value]="''">Aucune</nb-option>
+                            <nb-option *ngFor="let action of actionOptionsFor2(row.actionField)" [value]="action">
+                                {{ action }}
+                            </nb-option>
+                        </nb-select>
                     </div>
                     <div class="col-sm-5">
                         <input type="text" nbInput fullWidth fieldSize="small"

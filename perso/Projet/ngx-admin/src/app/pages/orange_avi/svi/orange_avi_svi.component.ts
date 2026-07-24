@@ -71,6 +71,7 @@ export class OrangeAviSviComponent implements OnInit {
   svi: OrangeAviSvi = emptySvi();
   svi2: OrangeAviSvi2 = emptySvi2();
   audioOptions: string[] = [];
+  readonly actionOptions: string[] = ['campagne', 'Extention', 'Numero', 'SVI2'];
   isSaving: boolean = false;
 
   readonly menuRows: SviMenuRow<OrangeAviSvi>[] = [
@@ -158,6 +159,20 @@ export class OrangeAviSviComponent implements OnInit {
 
   setField2(field: keyof OrangeAviSvi2, value: string): void {
     (this.svi2 as any)[field] = value === '' ? null : value;
+  }
+
+  actionOptionsFor(field: keyof OrangeAviSvi): string[] {
+    const current = this.getField(field);
+    return current && !this.actionOptions.includes(current)
+      ? [current, ...this.actionOptions]
+      : this.actionOptions;
+  }
+
+  actionOptionsFor2(field: keyof OrangeAviSvi2): string[] {
+    const current = this.getField2(field);
+    return current && !this.actionOptions.includes(current)
+      ? [current, ...this.actionOptions]
+      : this.actionOptions;
   }
 
   onClearRow(row: SviMenuRow<OrangeAviSvi>): void {
