@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrangeAviProfile } from './interfaces/orange_avi_profile.entity';
 import { OrangeAviTimes } from 'src/orange_avi_times/interfaces/orange_avi_times.entity';
+import { OrangeAviSvi } from 'src/orange_avi_svi/interfaces/orange_avi_svi.entity';
+import { OrangeAviSvi2 } from 'src/orange_avi_svi2/interfaces/orange_avi_svi2.entity';
 import {
   CreateOrangeAviProfileDto,
   UpdateOrangeAviProfileDto,
@@ -15,6 +17,10 @@ export class OrangeAviProfileService {
     private readonly oapRepository: Repository<OrangeAviProfile>,
     @InjectRepository(OrangeAviTimes)
     private readonly oatRepository: Repository<OrangeAviTimes>,
+    @InjectRepository(OrangeAviSvi)
+    private readonly oasRepository: Repository<OrangeAviSvi>,
+    @InjectRepository(OrangeAviSvi2)
+    private readonly oas2Repository: Repository<OrangeAviSvi2>,
   ) {}
 
   async findAll(): Promise<OrangeAviProfile[]> {
@@ -46,17 +52,34 @@ export class OrangeAviProfileService {
     if (oapToDelete === null) {
       throw new Error(`OrangeAviProfile with uid ${uid} not found.`);
     }
+
+    const svisToDelete = await this.oasRepository.find({
+      where: { profile: { uid } },
+      relations: { profile: true },
+    });
+    if (svisToDelete.length) {
+      await this.oasRepository.remove(svisToDelete);
+    }
+
+    const svis2ToDelete = await this.oas2Repository.find({
+      where: { profile: { uid } },
+      relations: { profile: true },
+    });
+    if (svis2ToDelete.length) {
+      await this.oas2Repository.remove(svis2ToDelete);
+    }
+
     await this.oapRepository.remove(oapToDelete);
   }
 
   /**
-   * Duplique un profil (nom + "_copy") ainsi que tous ses horaires en une
-   * seule opération côté serveur, plutôt que de multiplier les allers-retours HTTP.
+   * Duplique un profil (nom + "_copy") ainsi que tous ses horaires et SVI en
+   * une seule opération côté serveur, plutôt que de multiplier les allers-retours HTTP.
    */
   async duplicate(uid: number): Promise<OrangeAviProfile> {
     const original = await this.oapRepository.findOne({
       where: { uid },
-      relations: { times: true },
+      relations: { times: true, svis: true, svis2: true },
     });
     if (original === null) {
       throw new NotFoundException(`OrangeAviProfile with uid ${uid} not found.`);
@@ -81,6 +104,26 @@ export class OrangeAviProfileService {
         }),
       );
       await this.oatRepository.save(newTimes);
+    }
+
+    if (svis?.length) {
+      const newSvis = svis.map(({ uid: _sviUid, profile: _profile, ...sviRest }) =>
+        this.oasRepository.create({
+          ...sviRest,
+          profile: newProfile,
+        }),
+      );
+      await this.oasRepository.save(newSvis);
+    }
+
+    if (svis2?.length) {
+      const newSvis2 = svis2.map(({ uid: _sviUid, profile: _profile, ...sviRest }) =>
+        this.oas2Repository.create({
+          ...sviRest,
+          profile: newProfile,
+        }),
+      );
+      await this.oas2Repository.save(newSvis2);
     }
 
     return this.findOne(newProfile.uid) as Promise<OrangeAviProfile>;
