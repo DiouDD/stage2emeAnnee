@@ -2,9 +2,6 @@ import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { LocalDataSource } from 'ng2-smart-table';
 import { OrangeAviTimesService } from './orange_avi_times.service';
 import { OrangeAviTimes } from './orange_avi_times.model';
-import { OrangeAviProfileService } from '../profile/orange_avi_profile.service';
-import { OrangeAviProfile } from '../profile/orange_avi_profile.model';
-import { ProfileStateService } from '../profile/profile_state.service';
 
 @Component({
   selector: 'ngx-orange-avi-times',
@@ -52,9 +49,7 @@ export class OrangeAviTimesComponent implements OnInit {
   editingExceptionId: any = null;                       // UID de l'exception en cours d'édition (null si aucune)
 
   constructor(
-    private oatService: OrangeAviTimesService, 
-    private oapService: OrangeAviProfileService, 
-    private profileStateService: ProfileStateService
+    private oatService: OrangeAviTimesService
   ) {}
     
   // ==========================================

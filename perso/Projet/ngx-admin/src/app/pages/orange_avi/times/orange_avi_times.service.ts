@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { OrangeAviTimes } from './orange_avi_times.model';
 
 @Injectable({

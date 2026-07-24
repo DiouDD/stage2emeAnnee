@@ -48,13 +48,6 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
   selectedProfileId: number = 1;
   /** `true` quand le champ "Nom" est en mode édition (input texte au lieu du sélecteur déroulant). */
   isEditingProfileName: boolean = false;
-  /**
-   * Uid d'un profil dont la sélection a été demandée (via {@link ProfileStateService})
-   * avant que `loadOrangeAviProfiles()` n'ait fini de charger la liste. Résolu dès que
-   * les données arrivent (voir `selectProfileByUid`).
-   */
-  private pendingProfileUid: number | null = null;
-
   /** Abonnement à `profileStateService.currentProfile$`, nettoyé dans `ngOnDestroy`. */
   private profileSubscription: Subscription = new Subscription();
 
@@ -96,22 +89,16 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
 
   /**
    * Sélectionne, parmi les profils déjà chargés, celui dont l'uid correspond.
-   * Si la liste n'est pas encore chargée (ex: clic venant de la page des préfixes
-   * avant la fin de l'appel HTTP initial), l'uid est mémorisé pour être résolu
-   * dès que loadOrangeAviProfiles() aura terminé.
    */
   private selectProfileByUid(uid: number): void {
     const found = this.profiles.find(p => p.uid === uid);
     if (found) {
-      this.pendingProfileUid = null;
       this.selectedProfile = found;
       this.newSelectedProfile = { ...found };
       this.isEditing = false;
       this.isEditingProfileName = false;
       this.onProfileSelected(found.uid);
       console.dir(this.newSelectedProfile)
-    } else {
-      this.pendingProfileUid = uid;
     }
   }
 
@@ -127,16 +114,6 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
       next: (data) => {
         this.source.load(data);
         this.profiles = data;
-
-        /*if (this.pendingProfileUid != null) {
-          // Une sélection était en attente (course avec cet appel HTTP) : on la résout maintenant.
-          this.selectProfileByUid(this.pendingProfileUid);
-        } else if (data.length > 0 && !this.selectedProfile) {
-          // Sélection automatique du premier profil au démarrage
-          this.selectedProfile = data[0];
-          this.newSelectedProfile = { ...data[0] };
-          this.onProfileSelected(data[0].uid);
-        }*/
       },
       error: (err) => {
         console.error('Erreur lors du chargement des profils :', err);
