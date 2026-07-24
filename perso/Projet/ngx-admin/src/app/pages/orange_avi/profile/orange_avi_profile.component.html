@@ -92,7 +92,7 @@
                     </nb-select>
                 </div>
                 <div class="form-group mb-4">
-                    <label class="label">4. Message de dissuasion ( si rien de renseigner, raccrochage auto )</label>
+                    <label class="label">4. Message de dissuasion ( si vide, raccrochage auto )</label>
                     <nb-select fullWidth selected="dissuasion"
                             [(ngModel)]="newSelectedProfile.audio_dissuasion"
                             (selectedChange)="onAudioDissuasionChange($event)">

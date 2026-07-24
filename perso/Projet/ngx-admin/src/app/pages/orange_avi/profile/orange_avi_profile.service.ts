@@ -29,28 +29,42 @@ export class OrangeAviProfileService {
 
   /** Récupère la liste complète des profils Orange AVI (`GET /oapros`). */
   getOaps(): Observable<OrangeAviProfile[]> {
-    return this.http.get<OrangeAviProfile[]>(this.apiUrl);
+    console.log('[API] GET', this.apiUrl);
+    return this.http.get<OrangeAviProfile[]>(this.apiUrl).pipe(
+      tap(data => console.log('[API] GET', this.apiUrl, '-> réponse:', data))
+    );
   }
 
   /** Récupère un profil unique par son uid (`GET /oapros/:id`). */
   getOapsById(id: number): Observable<OrangeAviProfile> {
-    return this.http.get<OrangeAviProfile>(`${this.apiUrl}/${id}`);
+    console.log('[API] GET', `${this.apiUrl}/${id}`);
+    return this.http.get<OrangeAviProfile>(`${this.apiUrl}/${id}`).pipe(
+      tap(data => console.log('[API] GET', `${this.apiUrl}/${id}`, '-> réponse:', data))
+    );
   }
 
   /** Crée un nouveau profil (`POST /oapros`). */
   addOap(oap: OrangeAviProfile): Observable<OrangeAviProfile> {
-    return this.http.post<OrangeAviProfile>(this.apiUrl, oap);
+    console.log('[API] POST', this.apiUrl, 'payload:', oap);
+    return this.http.post<OrangeAviProfile>(this.apiUrl, oap).pipe(
+      tap(data => console.log('[API] POST', this.apiUrl, '-> réponse:', data))
+    );
   }
 
   /** Met à jour un profil existant, identifié par `updatedOap.uid` (`PUT /oapros/:id`). */
   updateOap(updatedOap: OrangeAviProfile): Observable<OrangeAviProfile> {
-    console.log("Mise a jour du profil");
-    return this.http.put<OrangeAviProfile>(`${this.apiUrl}/${updatedOap.uid}`, updatedOap)
+    console.log('[API] PUT', `${this.apiUrl}/${updatedOap.uid}`, 'payload:', updatedOap);
+    return this.http.put<OrangeAviProfile>(`${this.apiUrl}/${updatedOap.uid}`, updatedOap).pipe(
+      tap(data => console.log('[API] PUT', `${this.apiUrl}/${updatedOap.uid}`, '-> réponse:', data))
+    );
   }
 
   /** Supprime un profil par son uid (`DELETE /oapros/:id`). Échoue si le profil est encore utilisé par un préfixe. */
   deleteOap(uid: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${uid}`);
+    console.log('[API] DELETE', `${this.apiUrl}/${uid}`);
+    return this.http.delete<void>(`${this.apiUrl}/${uid}`).pipe(
+      tap(() => console.log('[API] DELETE', `${this.apiUrl}/${uid}`, '-> OK'))
+    );
   }
 
   /**
@@ -58,7 +72,10 @@ export class OrangeAviProfileService {
    * (`POST /oapros/:id/duplicate`). Le profil créé reçoit le nom `"<original>_copy"`.
    */
   duplicateOap(uid: number): Observable<OrangeAviProfile> {
-    return this.http.post<OrangeAviProfile>(`${this.apiUrl}/${uid}/duplicate`, {});
+    console.log('[API] POST', `${this.apiUrl}/${uid}/duplicate`);
+    return this.http.post<OrangeAviProfile>(`${this.apiUrl}/${uid}/duplicate`, {}).pipe(
+      tap(data => console.log('[API] POST', `${this.apiUrl}/${uid}/duplicate`, '-> réponse:', data))
+    );
   }
 
   /**
@@ -69,11 +86,14 @@ export class OrangeAviProfileService {
    */
   getFiles(): Observable<string[]> {
     if (this.filesCacheEntry && Date.now() < this.filesCacheEntry.expiresAt) {
+      console.log('[API] GET', this.filesUrl, '-> depuis le cache (pas de requête réseau)');
       return of(this.filesCacheEntry.data);
     }
 
+    console.log('[API] GET', this.filesUrl);
     return this.http.get<string[]>(this.filesUrl).pipe(
       tap(data => {
+        console.log('[API] GET', this.filesUrl, '-> réponse:', data);
         this.filesCacheEntry = { data, expiresAt: Date.now() + this.FILES_CACHE_TTL_MS };
       })
     );

@@ -6,7 +6,10 @@ export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Get()
-  findAll(): Promise<string[]> {
-    return this.filesService.findAllPaths();
+  async findAll(): Promise<string[]> {
+    console.log('[API] GET /files');
+    const result = await this.filesService.findAllPaths();
+    console.log('[API] GET /files -> réponse:', result);
+    return result;
   }
 }

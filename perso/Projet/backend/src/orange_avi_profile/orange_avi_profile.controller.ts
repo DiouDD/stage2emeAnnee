@@ -28,42 +28,59 @@ export class OrangeAviProfileController {
   constructor(private readonly oapsService: OrangeAviProfileService) {}
 
   @Get()
-  findAll(): Promise<OrangeAviProfile[]> {
-    return this.oapsService.findAll();
+  async findAll(): Promise<OrangeAviProfile[]> {
+    console.log('[API] GET /oapros');
+    const result = await this.oapsService.findAll();
+    console.log('[API] GET /oapros -> réponse:', result);
+    return result;
   }
 
   @Get(':id')
-  findOne(
+  async findOne(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<OrangeAviProfile | null> {
-    return this.oapsService.findOne(id);
+    console.log('[API] GET /oapros/:id', id);
+    const result = await this.oapsService.findOne(id);
+    console.log('[API] GET /oapros/:id', id, '-> réponse:', result);
+    return result;
   }
 
   @Post()
   @UsePipes(new ZodValidationPipe(createOrangeAviProfileSchema))
-  create(@Body() client: CreateOrangeAviProfileDto): Promise<OrangeAviProfile> {
-    return this.oapsService.create(client);
+  async create(@Body() client: CreateOrangeAviProfileDto): Promise<OrangeAviProfile> {
+    console.log('[API] POST /oapros payload:', client);
+    const result = await this.oapsService.create(client);
+    console.log('[API] POST /oapros -> réponse:', result);
+    return result;
   }
 
   @Post(':id/duplicate')
-  duplicate(
+  async duplicate(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<OrangeAviProfile> {
-    return this.oapsService.duplicate(id);
+    console.log('[API] POST /oapros/:id/duplicate', id);
+    const result = await this.oapsService.duplicate(id);
+    console.log('[API] POST /oapros/:id/duplicate', id, '-> réponse:', result);
+    return result;
   }
 
   @Put(':id')
   @UsePipes(new ZodValidationPipe(updateOrangeAviProfileSchema))
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() client: UpdateOrangeAviProfileDto,
   ): Promise<OrangeAviProfile | null> {
-    return this.oapsService.update(id, client);
+    console.log('[API] PUT /oapros/:id', id, 'payload:', client);
+    const result = await this.oapsService.update(id, client);
+    console.log('[API] PUT /oapros/:id', id, '-> réponse:', result);
+    return result;
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.oapsService.delete(id);
+  async delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    console.log('[API] DELETE /oapros/:id', id);
+    await this.oapsService.delete(id);
+    console.log('[API] DELETE /oapros/:id', id, '-> OK');
   }
 }

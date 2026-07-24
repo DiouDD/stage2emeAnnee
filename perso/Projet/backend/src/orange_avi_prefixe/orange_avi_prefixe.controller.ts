@@ -34,16 +34,22 @@ export class OrangeAviPrefixeController {
 
   /** `GET /oapres` — liste tous les préfixes, profil associé inclus. */
   @Get()
-  findAll(): Promise<OrangeAviPrefixe[]> {
-    return this.oapsService.findAll();
+  async findAll(): Promise<OrangeAviPrefixe[]> {
+    console.log('[API] GET /oapres');
+    const result = await this.oapsService.findAll();
+    console.log('[API] GET /oapres -> réponse:', result);
+    return result;
   }
 
   /** `GET /oapres/:id` — récupère un préfixe par son uid. */
   @Get(':id')
-  findOne(
+  async findOne(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<OrangeAviPrefixe | null> {
-    return this.oapsService.findOne(id);
+    console.log('[API] GET /oapres/:id', id);
+    const result = await this.oapsService.findOne(id);
+    console.log('[API] GET /oapres/:id', id, '-> réponse:', result);
+    return result;
   }
 
   /**
@@ -52,8 +58,11 @@ export class OrangeAviPrefixeController {
    */
   @Post()
   @UsePipes(new ZodValidationPipe(createOrangeAviPrefixeSchema))
-  create(@Body() client: CreateOrangeAviPrefixeDto): Promise<OrangeAviPrefixe> {
-    return this.oapsService.create(client);
+  async create(@Body() client: CreateOrangeAviPrefixeDto): Promise<OrangeAviPrefixe> {
+    console.log('[API] POST /oapres payload:', client);
+    const result = await this.oapsService.create(client);
+    console.log('[API] POST /oapres -> réponse:', result);
+    return result;
   }
 
   /**
@@ -63,17 +72,22 @@ export class OrangeAviPrefixeController {
    */
   @Put(':id')
   @UsePipes(new ZodValidationPipe(updateOrangeAviPrefixeSchema))
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() client: UpdateOrangeAviPrefixeDto,
   ): Promise<OrangeAviPrefixe | null> {
-    return this.oapsService.update(id, client);
+    console.log('[API] PUT /oapres/:id', id, 'payload:', client);
+    const result = await this.oapsService.update(id, client);
+    console.log('[API] PUT /oapres/:id', id, '-> réponse:', result);
+    return result;
   }
 
   /** `DELETE /oapres/:id` — supprime un préfixe ; répond `204 No Content`. */
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.oapsService.delete(id);
+  async delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    console.log('[API] DELETE /oapres/:id', id);
+    await this.oapsService.delete(id);
+    console.log('[API] DELETE /oapres/:id', id, '-> OK');
   }
 }

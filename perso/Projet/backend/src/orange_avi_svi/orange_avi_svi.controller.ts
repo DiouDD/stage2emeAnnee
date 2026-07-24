@@ -28,48 +28,67 @@ export class OrangeAviSviController {
   constructor(private readonly oasService: OrangeAviSviService) {}
 
   @Get()
-  findAll(): Promise<OrangeAviSvi[]> {
-    return this.oasService.findAll();
+  async findAll(): Promise<OrangeAviSvi[]> {
+    console.log('[API] GET /oasvi');
+    const result = await this.oasService.findAll();
+    console.log('[API] GET /oasvi -> réponse:', result);
+    return result;
   }
 
   @Get('profile/:profileId')
-  findByProfile(
+  async findByProfile(
     @Param('profileId', ParseIntPipe) profileId: number,
   ): Promise<OrangeAviSvi[]> {
-    return this.oasService.findByProfile(profileId);
+    console.log('[API] GET /oasvi/profile/:profileId', profileId);
+    const result = await this.oasService.findByProfile(profileId);
+    console.log('[API] GET /oasvi/profile/:profileId', profileId, '-> réponse:', result);
+    return result;
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<OrangeAviSvi | null> {
-    return this.oasService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<OrangeAviSvi | null> {
+    console.log('[API] GET /oasvi/:id', id);
+    const result = await this.oasService.findOne(id);
+    console.log('[API] GET /oasvi/:id', id, '-> réponse:', result);
+    return result;
   }
 
   @Post()
   @UsePipes(new ZodValidationPipe(createOrangeAviSviSchema))
-  create(@Body() body: CreateOrangeAviSviDto): Promise<OrangeAviSvi> {
-    return this.oasService.create(body);
+  async create(@Body() body: CreateOrangeAviSviDto): Promise<OrangeAviSvi> {
+    console.log('[API] POST /oasvi payload:', body);
+    const result = await this.oasService.create(body);
+    console.log('[API] POST /oasvi -> réponse:', result);
+    return result;
   }
 
   @Put(':id')
   @UsePipes(new ZodValidationPipe(updateOrangeAviSviSchema))
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateOrangeAviSviDto,
   ): Promise<OrangeAviSvi | null> {
-    return this.oasService.update(id, body);
+    console.log('[API] PUT /oasvi/:id', id, 'payload:', body);
+    const result = await this.oasService.update(id, body);
+    console.log('[API] PUT /oasvi/:id', id, '-> réponse:', result);
+    return result;
   }
 
   @Delete('profile/:profileId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteByProfile(
+  async deleteByProfile(
     @Param('profileId', ParseIntPipe) profileId: number,
   ): Promise<void> {
-    return this.oasService.deleteByProfile(profileId);
+    console.log('[API] DELETE /oasvi/profile/:profileId', profileId);
+    await this.oasService.deleteByProfile(profileId);
+    console.log('[API] DELETE /oasvi/profile/:profileId', profileId, '-> OK');
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.oasService.delete(id);
+  async delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    console.log('[API] DELETE /oasvi/:id', id);
+    await this.oasService.delete(id);
+    console.log('[API] DELETE /oasvi/:id', id, '-> OK');
   }
 }
