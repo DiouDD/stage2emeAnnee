@@ -23,15 +23,22 @@ import type {
   UpdateOrangeAviPrefixeDto,
 } from './schemas/orange_avi_prefixe.schema';
 
+/**
+ * Contrôleur REST de la ressource `orange_avi_prefixe`, exposée sous `/oapres`
+ * (préfixes/DNIS/SDA de campagne Orange AVI). Consommé côté front par
+ * `OrangeAviPrefixeService` (ngx-admin).
+ */
 @Controller('oapres')
 export class OrangeAviPrefixeController {
   constructor(private readonly oapsService: OrangeAviPrefixeService) {}
 
+  /** `GET /oapres` — liste tous les préfixes, profil associé inclus. */
   @Get()
   findAll(): Promise<OrangeAviPrefixe[]> {
     return this.oapsService.findAll();
   }
 
+  /** `GET /oapres/:id` — récupère un préfixe par son uid. */
   @Get(':id')
   findOne(
     @Param('id', ParseIntPipe) id: number,
@@ -39,12 +46,21 @@ export class OrangeAviPrefixeController {
     return this.oapsService.findOne(id);
   }
 
+  /**
+   * `POST /oapres` — crée un préfixe.
+   * Le corps de la requête est validé par {@link createOrangeAviPrefixeSchema} (Zod).
+   */
   @Post()
   @UsePipes(new ZodValidationPipe(createOrangeAviPrefixeSchema))
   create(@Body() client: CreateOrangeAviPrefixeDto): Promise<OrangeAviPrefixe> {
     return this.oapsService.create(client);
   }
 
+  /**
+   * `PUT /oapres/:id` — met à jour un préfixe.
+   * Le corps de la requête est validé par {@link updateOrangeAviPrefixeSchema} (Zod) ;
+   * tous les champs sont optionnels.
+   */
   @Put(':id')
   @UsePipes(new ZodValidationPipe(updateOrangeAviPrefixeSchema))
   update(
@@ -54,6 +70,7 @@ export class OrangeAviPrefixeController {
     return this.oapsService.update(id, client);
   }
 
+  /** `DELETE /oapres/:id` — supprime un préfixe ; répond `204 No Content`. */
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   delete(@Param('id', ParseIntPipe) id: number): Promise<void> {

@@ -7,6 +7,20 @@ import { ProfileStateService } from './profile_state.service';
 import { OrangeAviProfile, OrangeAviProfileSchema } from './orange_avi_profile.model';
 import { OrangeAviSviComponent } from '../svi/orange_avi_svi.component';
 
+/**
+ * Onglet "Profil" de la fonctionnalité Orange AVI.
+ *
+ * Permet de :
+ * - lister/créer/éditer/supprimer/dupliquer les profils via un tableau (ng2-smart-table) ;
+ * - éditer en détail le profil sélectionné (nom, messages audio, temps d'attente,
+ *   dissuasion, barrage entrant, activation du SVI) via un formulaire dédié ;
+ * - afficher les horaires du profil ({@link OrangeAviTimesComponent}, enfant) et
+ *   son SVI (menu vocal) dans une modale ({@link OrangeAviSviComponent}).
+ *
+ * Se synchronise avec le reste de la page Orange AVI via {@link ProfileStateService} :
+ * un clic sur l'icône "œil" dans la table des préfixes sélectionne ici le profil
+ * correspondant (voir `profileStateService.currentProfile$`).
+ */
 @Component({
   selector: 'ngx-orange-avi-profile',
   templateUrl: './orange_avi_profile.component.html',
@@ -20,15 +34,28 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
 
   /** Source de données locale pour la table intelligente */
   public source: LocalDataSource = new LocalDataSource();
+  /** Profil actuellement sélectionné tel que chargé depuis le serveur (référence "propre"). */
   selectedProfile: OrangeAviProfile | null = null;
-  profiles: OrangeAviProfile[] = [];  
+  /** Liste complète des profils chargés depuis l'API, utilisée par le tableau et le sélecteur. */
+  profiles: OrangeAviProfile[] = [];
+  /** Copie éditable de `selectedProfile`, liée au formulaire (ngModel) ; envoyée au serveur lors de l'enregistrement. */
   newSelectedProfile: OrangeAviProfile | null = null;
+  /** `true` dès qu'une modification du formulaire n'a pas encore été enregistrée (affiche les boutons Enregistrer/Annuler). */
   isEditing: boolean = false;
+  /** Liste des noms de fichiers audio disponibles, utilisée pour peupler les `<nb-select>` de messages. */
   audioOptions: string[] = [];
+  /** Uid du profil sélectionné, transmis en `@Input` au composant enfant des horaires ({@link OrangeAviTimesComponent}). */
   selectedProfileId: number = 1;
+  /** `true` quand le champ "Nom" est en mode édition (input texte au lieu du sélecteur déroulant). */
   isEditingProfileName: boolean = false;
+  /**
+   * Uid d'un profil dont la sélection a été demandée (via {@link ProfileStateService})
+   * avant que `loadOrangeAviProfiles()` n'ait fini de charger la liste. Résolu dès que
+   * les données arrivent (voir `selectProfileByUid`).
+   */
   private pendingProfileUid: number | null = null;
 
+  /** Abonnement à `profileStateService.currentProfile$`, nettoyé dans `ngOnDestroy`. */
   private profileSubscription: Subscription = new Subscription();
 
   // ==========================================
@@ -36,8 +63,11 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
   // ==========================================
 
   constructor(
+    /** Accès à l'API REST des profils (CRUD, duplication, liste des fichiers audio). */
     private oapService: OrangeAviProfileService,
+    /** État partagé entre les onglets/composants Orange AVI (profil sélectionné, notifications de changement). */
     private profileStateService: ProfileStateService,
+    /** Service Nebular utilisé pour ouvrir la modale du SVI. */
     private dialogService: NbDialogService
   ) {}
 
@@ -114,6 +144,10 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Met à jour `selectedProfileId`, ce qui déclenche automatiquement `ngOnChanges`
+   * dans le composant enfant des horaires ({@link OrangeAviTimesComponent}).
+   */
   onProfileSelected(newId: number): void {
     this.selectedProfileId = newId; // déclenche automatiquement ngOnChanges dans l'enfant
   }
@@ -153,11 +187,10 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Intercepte et valide la création d'un nouveau profil via le tableau.
+   * Intercepte la création d'un nouveau profil via le tableau (ng2-smart-table) :
+   * auto-incrémente l'UID, applique des valeurs par défaut aux champs non affichés
+   * dans le tableau, puis valide via Zod avant l'appel à l'API.
    * @param event Événement de création de ng2-smart-table
-   */
-  /**
-   * Intercepte, auto-incrémente l'UID, applique des valeurs par défaut et valide via Zod.
    */
   public onCreateConfirm(event: any): void {
     const newData = event.newData;
@@ -356,6 +389,7 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Recharge la liste des profils, notifie les autres vues, puis sélectionne le profil dupliqué. */
   private finishDuplication(createdProfile: OrangeAviProfile): void {
     this.loadOrangeAviProfiles();
     this.profileStateService.notifyProfilesChanged();
@@ -376,6 +410,7 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
   });
 }
 
+  /** Met à jour le message d'accueil du formulaire et marque celui-ci comme modifié. */
   onAudioWelcomeChange(audioWelcome: string): void {
     if (this.selectedProfile && this.newSelectedProfile) {
       this.newSelectedProfile.audio_welcome = audioWelcome;
@@ -383,6 +418,7 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
     this.isEditing = true;
   }
 
+  /** Met à jour le message d'attente du formulaire et marque celui-ci comme modifié. */
   onAudioWaitingChange(audioWaiting: string): void {
     if (this.selectedProfile && this.newSelectedProfile) {
       this.newSelectedProfile.audio_waiting = audioWaiting;
@@ -390,6 +426,7 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
     this.isEditing = true;
   }
 
+  /** Met à jour le message de dissuasion du formulaire et marque celui-ci comme modifié. */
   onAudioDissuasionChange(audioDissuasion: string): void {
     if (this.selectedProfile && this.newSelectedProfile) {
       this.newSelectedProfile.audio_dissuasion = audioDissuasion;
@@ -397,6 +434,7 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
     this.isEditing = true;
   }
 
+  /** Met à jour le message de fermeture du formulaire et marque celui-ci comme modifié. */
   onAudioClosingChange(audioClosing: string): void {
     if (this.selectedProfile && this.newSelectedProfile) {
       this.newSelectedProfile.audio_closing = audioClosing;
@@ -404,6 +442,7 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
     this.isEditing = true;
   }
 
+  /** Met à jour le message de fermeture exceptionnelle du formulaire et marque celui-ci comme modifié. */
   onAudioExceptChange(audioExceptionnel: string): void {
     if (this.selectedProfile && this.newSelectedProfile) {
       this.newSelectedProfile.audio_exceptionnel = audioExceptionnel;
@@ -411,6 +450,7 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
     this.isEditing = true;
   }
 
+  /** Met à jour le message flash du formulaire et marque celui-ci comme modifié. */
   onAudioFlashChange(audioFlash: string): void {
     if (this.selectedProfile && this.newSelectedProfile) {
       this.newSelectedProfile.audio_flash = audioFlash;
@@ -418,6 +458,7 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
     this.isEditing = true;
   }
 
+  /** Met à jour le message de barrage entrant du formulaire et marque celui-ci comme modifié. */
   onBarrageChange(barrageEntrant: string): void {
     if (this.selectedProfile && this.newSelectedProfile) {
       this.newSelectedProfile.barrage_entrant = barrageEntrant;
@@ -425,6 +466,7 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
     this.isEditing = true;
   }
 
+  /** Met à jour le type de dissuasion du formulaire et marque celui-ci comme modifié. */
   onTypeDissuasionChange(typeDissuasion: string): void {
     if (this.selectedProfile && this.newSelectedProfile) {
       this.newSelectedProfile.type_dissuasion = typeDissuasion;
@@ -432,14 +474,17 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
     this.isEditing = true;
   }
 
+  /** Marque le formulaire comme modifié suite à la saisie du champ "Ch1 dissuasion". */
   onCh1DissuasionChange(): void {
     this.isEditing = true;
   }
 
+  /** `true` si le SVI (menu vocal) est activé pour le profil en cours d'édition. */
   get sviActif(): boolean {
     return !!this.newSelectedProfile?.menu_actif;
   }
 
+  /** Active/désactive le SVI du profil en cours d'édition (case à cocher "Activer le SVI"). */
   onSviActifChange(checked: boolean): void {
     if (this.newSelectedProfile) {
       this.newSelectedProfile.menu_actif = checked ? 1 : 0;
@@ -447,6 +492,10 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
     this.isEditing = true;
   }
 
+  /**
+   * Ouvre la modale du SVI ({@link OrangeAviSviComponent}) pour visualiser/éditer
+   * le menu vocal du profil actuellement sélectionné.
+   */
   public onVoirSviClick(): void {
     if (!this.selectedProfile) return;
     this.dialogService.open(OrangeAviSviComponent, {

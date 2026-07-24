@@ -9,6 +9,10 @@ import {
   UpdateOrangeAviPrefixeDto,
 } from './schemas/orange_avi_prefixe.schema';
 
+/**
+ * Logique métier de la ressource `orange_avi_prefixe` (CRUD + liaison à un profil).
+ * Consommé par {@link OrangeAviPrefixeController}.
+ */
 @Injectable()
 export class OrangeAviPrefixeService {
   constructor(
@@ -16,6 +20,7 @@ export class OrangeAviPrefixeService {
     private readonly oapRepository: Repository<OrangeAviPrefixe>,
   ) {}
 
+  /** Récupère tous les préfixes, avec leur profil associé (relation `profile`) chargé. */
   async findAll(): Promise<OrangeAviPrefixe[]> {
     const result = await this.oapRepository.find({
       relations: {
@@ -26,6 +31,7 @@ export class OrangeAviPrefixeService {
     return result;
   }
 
+  /** Récupère un préfixe par son uid, avec son profil associé (relation `profile`) chargé. */
   async findOne(uid: number): Promise<OrangeAviPrefixe | null> {
     const result = await this.oapRepository.findOne({
       where: { uid: uid },
@@ -37,6 +43,11 @@ export class OrangeAviPrefixeService {
     return result;
   }
 
+  /**
+   * Crée un nouveau préfixe. L'uid est calculé manuellement (max des uids existants + 1)
+   * plutôt que délégué à l'auto-increment MySQL. Si `profileUid` est fourni, le préfixe
+   * est immédiatement lié au profil correspondant.
+   */
   async create(oap: CreateOrangeAviPrefixeDto): Promise<OrangeAviPrefixe> {
     const oaps = await this.oapRepository.find();
     const newId = oaps.length > 0 ? Math.max(...oaps.map((c) => c.uid)) + 1 : 1;
@@ -56,6 +67,12 @@ export class OrangeAviPrefixeService {
     return this.findOne(newOrange_avi_prefixe.uid) as Promise<OrangeAviPrefixe>;
   }
 
+  /**
+   * Met à jour un préfixe existant. `profileUid` peut valoir :
+   * - `undefined` : le lien vers le profil n'est pas modifié ;
+   * - un nombre : le préfixe est lié à ce profil ;
+   * - `null` : le préfixe est délié de tout profil.
+   */
   async update(
     uid: number,
     updatedFields: UpdateOrangeAviPrefixeDto,
@@ -77,6 +94,10 @@ export class OrangeAviPrefixeService {
     return this.findOne(uid);
   }
 
+  /**
+   * Supprime un préfixe par son uid.
+   * @throws Error si aucun préfixe ne correspond à cet uid.
+   */
   async delete(uid: number): Promise<void> {
     const oapToDelete = await this.findOne(uid);
     if (oapToDelete === null) {

@@ -1,84 +1,90 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, from } from 'rxjs';
-import { shareReplay } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { OrangeAviProfile } from './orange_avi_profile.model';
 
+/**
+ * Service d'accès à l'API REST des profils Orange AVI (endpoint `/oapros`).
+ * Centralise les appels HTTP (CRUD + duplication) ainsi que la récupération,
+ * avec mise en cache, de la liste des fichiers audio disponibles (`/files`)
+ * utilisée pour peupler les listes déroulantes de messages du composant.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class OrangeAviProfileService {
+  /** URL de base de l'API des profils Orange AVI. */
   private apiUrl = "http://localhost:3000/oapros";
+  /** URL de l'API listant les fichiers audio disponibles sur le serveur. */
   private filesUrl = "http://localhost:3000/files";
 
-  /** Nom du Cache Storage (navigateur) utilisé pour persister la liste des fichiers. */
-  private readonly FILES_CACHE_NAME = 'oap-files-cache';
+  /** Durée de vie du cache en mémoire avant rechargement forcé depuis le serveur. */
+  private readonly FILES_CACHE_TTL_MS = 2 * 60 * 60 * 1000; // 2 heures
 
-  /** Cache en mémoire de l'Observable, pour ne déclencher qu'une seule lecture/écriture du Cache Storage par session. */
-  private filesCache$: Observable<string[]> | null = null;
+  /** Cache en mémoire (perdu au rechargement de page) de la liste des fichiers. */
+  private filesCacheEntry: { data: string[]; expiresAt: number } | null = null;
 
   constructor(private http: HttpClient){}
 
+  /** Récupère la liste complète des profils Orange AVI (`GET /oapros`). */
   getOaps(): Observable<OrangeAviProfile[]> {
     return this.http.get<OrangeAviProfile[]>(this.apiUrl);
   }
 
+  /** Récupère un profil unique par son uid (`GET /oapros/:id`). */
   getOapsById(id: number): Observable<OrangeAviProfile> {
     return this.http.get<OrangeAviProfile>(`${this.apiUrl}/${id}`);
   }
-  
+
+  /** Crée un nouveau profil (`POST /oapros`). */
   addOap(oap: OrangeAviProfile): Observable<OrangeAviProfile> {
     return this.http.post<OrangeAviProfile>(this.apiUrl, oap);
   }
 
+  /** Met à jour un profil existant, identifié par `updatedOap.uid` (`PUT /oapros/:id`). */
   updateOap(updatedOap: OrangeAviProfile): Observable<OrangeAviProfile> {
     console.log("Mise a jour du profil");
     return this.http.put<OrangeAviProfile>(`${this.apiUrl}/${updatedOap.uid}`, updatedOap)
   }
 
+  /** Supprime un profil par son uid (`DELETE /oapros/:id`). Échoue si le profil est encore utilisé par un préfixe. */
   deleteOap(uid: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${uid}`);
   }
 
+  /**
+   * Duplique un profil et tous ses horaires en une seule requête serveur
+   * (`POST /oapros/:id/duplicate`). Le profil créé reçoit le nom `"<original>_copy"`.
+   */
   duplicateOap(uid: number): Observable<OrangeAviProfile> {
     return this.http.post<OrangeAviProfile>(`${this.apiUrl}/${uid}/duplicate`, {});
   }
 
   /**
-   * Récupère la liste de tous les fichiers audio disponibles côté serveur (endpoint /files)
-   * et la stocke dans le Cache Storage du navigateur (celui visible dans DevTools > Application >
-   * Cache Storage), pour que la donnée persiste même après un rechargement de page (F5) sans
-   * refaire de requête réseau.
+   * Récupère la liste de tous les fichiers audio disponibles côté serveur (endpoint /files).
+   * Le résultat est gardé en mémoire pendant FILES_CACHE_TTL_MS (2h) : tant que le cache est
+   * valide, aucun appel HTTP n'est refait ; une fois expiré (ou après un rechargement de page),
+   * une nouvelle requête est envoyée et le cache est renouvelé.
    */
   getFiles(): Observable<string[]> {
-    if (!this.filesCache$) {
-      this.filesCache$ = from(this.fetchFilesWithCacheStorage()).pipe(
-        shareReplay(1)
-      );
-    }
-    return this.filesCache$;
-  }
-
-  /** Vide le Cache Storage des fichiers (ex: après ajout d'un nouveau fichier audio côté serveur). */
-  async clearFilesCache(): Promise<void> {
-    this.filesCache$ = null;
-    const cache = await caches.open(this.FILES_CACHE_NAME);
-    await cache.delete(this.filesUrl);
-  }
-
-  private async fetchFilesWithCacheStorage(): Promise<string[]> {
-    const cache = await caches.open(this.FILES_CACHE_NAME);
-
-    const cachedResponse = await cache.match(this.filesUrl);
-    if (cachedResponse) {
-      return cachedResponse.json();
+    if (this.filesCacheEntry && Date.now() < this.filesCacheEntry.expiresAt) {
+      return of(this.filesCacheEntry.data);
     }
 
-    const response = await fetch(this.filesUrl);
-    await cache.put(this.filesUrl, response.clone());
-    return response.json();
+    return this.http.get<string[]>(this.filesUrl).pipe(
+      tap(data => {
+        this.filesCacheEntry = { data, expiresAt: Date.now() + this.FILES_CACHE_TTL_MS };
+      })
+    );
   }
 
+  /** Invalide le cache en mémoire (ex: après ajout d'un nouveau fichier audio côté serveur). */
+  clearFilesCache(): void {
+    this.filesCacheEntry = null;
+  }
+
+  /** Alias public de {@link getFiles}, utilisé par le composant pour peupler les `<nb-select>` audio. */
   getAudioOptions(): Observable<string[]> {
     return this.getFiles();
   }

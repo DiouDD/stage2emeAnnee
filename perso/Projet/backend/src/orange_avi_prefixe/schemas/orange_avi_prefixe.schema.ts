@@ -1,5 +1,10 @@
 import { z } from 'zod';
 
+/**
+ * Schémas de validation Zod pour la ressource `orange_avi_prefixe` (route `/oapres`),
+ * utilisés par {@link ZodValidationPipe} dans {@link OrangeAviPrefixeController}.
+ */
+
 // Schéma de création
 // + profileUid, optionnel, pour lier un profil au moment de la création.
 export const createOrangeAviPrefixeSchema = z.object({
@@ -11,6 +16,7 @@ export const createOrangeAviPrefixeSchema = z.object({
   profileUid: z.coerce.number().int().positive().optional(),
 });
 
+/** DTO inféré du schéma de création : payload attendu par `POST /oapres`. */
 export type CreateOrangeAviPrefixeDto = z.infer<
   typeof createOrangeAviPrefixeSchema
 >;
@@ -24,6 +30,7 @@ export const updateOrangeAviPrefixeSchema = createOrangeAviPrefixeSchema
     profileUid: z.coerce.number().int().positive().nullable().optional(),
   });
 
+/** DTO inféré du schéma de mise à jour : payload attendu par `PUT /oapres/:id`. */
 export type UpdateOrangeAviPrefixeDto = z.infer<
   typeof updateOrangeAviPrefixeSchema
 >;
