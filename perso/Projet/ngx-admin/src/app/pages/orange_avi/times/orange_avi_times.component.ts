@@ -110,7 +110,7 @@ export class OrangeAviTimesComponent implements OnInit {
 
     const timeToTemplate = {
       profileUid: this.selectedProfileId,
-      day: new Date(),
+      day: new Date('1970-01-01T01:00:00'),
       dow: dayIndex,
       opening_time: this.newTimeOpening,
       closing_time: this.newTimeClosing
@@ -156,7 +156,7 @@ export class OrangeAviTimesComponent implements OnInit {
     const updatedTime = {
       uid: this.editingTimeId,
       profileUid: this.selectedProfileId,
-      day: new Date(),
+      day: new Date('1970-01-01T01:00:00'),
       dow: dayIndex,
       opening_time: this.newTimeOpening,
       closing_time: this.newTimeClosing
