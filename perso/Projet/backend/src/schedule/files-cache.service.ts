@@ -17,7 +17,7 @@ export class FilesCacheService implements OnModuleInit {
     await this.refresh();
   }
 
-  @Cron('* * 2 * * *')
+  @Cron('0 0 */2 * * *')
   async refresh(): Promise<string[]> {
     const paths = await this.walk(this.filesRoot);
     const relativePaths = paths

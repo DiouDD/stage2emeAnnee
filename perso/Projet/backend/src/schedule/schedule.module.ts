@@ -6,7 +6,7 @@ import { FilesCacheService } from './files-cache.service';
 @Module({
   imports: [
     CacheModule.register({
-      ttl: 2 * 60 * 60 * 1000, // 2 heures
+      ttl: 60 * 1000, // 2 heures
     }),
     NestScheduleModule.forRoot(),
   ],
