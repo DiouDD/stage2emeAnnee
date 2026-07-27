@@ -345,6 +345,12 @@ Voir pour mettre un form control pour tout les profils. Rajouter le SVI
 Aidé a mettre le profil au démarrage
 Pour les messages d'acceuil mattre Aucun au ieu de null
 Autre problème lors de la duplication, possibilité d'envoyer un objet profile avec tout les times dedans au lieu d'un profile et plein de times a coté
+
+
+## Reunion du 27/07/26
+
+Problème avec le cache : Mettre dans un schedule pour qu'il se mette à jour tout seul. Pas dans le services files ( qui lui va juste récupérer ce qu'il y à dans le cache ) Mais dans scheduler, qui va gérer le cache lui même et le raffraichir toutes les 2-3h
+
 ---
 
 Dans le cadre de ma deuxième année de BUT Informatique à l'IUT Clermont Auvergne, j'ai effectué un stage d'une durée de huit semaines, du 8 juin au 31 juillet 2026, au sein de l'entreprise Satel, une agence spécialisée dans la téléphonie située à Vichy. J'ai eu l'opportunité d'intégrer le service de la Direction des Systèmes d'Information (DSI), une équipe au cœur de l'infrastructure technique et logicielle de l'entreprise. Satel déploie son expertise autour de deux activités principales : le démarchage téléphonique (appels sortants) et le service après-vente (SAV / appels entrants) pour le compte de ses nombreuses entreprises partenaires.
