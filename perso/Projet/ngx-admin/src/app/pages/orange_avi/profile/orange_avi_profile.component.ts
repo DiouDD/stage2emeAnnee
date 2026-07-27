@@ -34,7 +34,7 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
 
   /** Source de données locale pour la table intelligente */
   public source: LocalDataSource = new LocalDataSource();
-  /** Profil actuellement sélectionné tel que chargé depuis le serveur (référence "propre"). */
+  /** Profil actuellement sélectionné tel que chargé depuis le serveur. */
   selectedProfile: OrangeAviProfile | null = null;
   /** Liste complète des profils chargés depuis l'API, utilisée par le tableau et le sélecteur. */
   profiles: OrangeAviProfile[] = [];

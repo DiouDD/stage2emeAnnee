@@ -1,14 +1,10 @@
 import { Module } from '@nestjs/common';
-import { CacheModule } from '@nestjs/cache-manager';
+import { ScheduleModule } from '../schedule/schedule.module';
 import { FilesController } from './files.controller';
 import { FilesService } from './files.service';
 
 @Module({
-  imports: [
-    CacheModule.register({
-      ttl: 10 * 60 * 1000, // 10 minutes
-    }),
-  ],
+  imports: [ScheduleModule],
   controllers: [FilesController],
   providers: [FilesService],
   exports: [FilesService],
