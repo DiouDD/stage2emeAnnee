@@ -4,7 +4,7 @@ import { LocalDataSource } from 'ng2-smart-table';
 import { NbDialogService } from '@nebular/theme';
 import { OrangeAviProfileService } from './orange_avi_profile.service';
 import { ProfileStateService } from './profile_state.service';
-import { OrangeAviProfile, OrangeAviProfileSchema } from './orange_avi_profile.model';
+import { OrangeAviProfile } from './orange_avi_profile.model';
 import { OrangeAviSviComponent } from '../svi/orange_avi_svi.component';
 
 /**
@@ -166,7 +166,7 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
   /**
    * Intercepte la création d'un nouveau profil via le tableau (ng2-smart-table) :
    * auto-incrémente l'UID, applique des valeurs par défaut aux champs non affichés
-   * dans le tableau, puis valide via Zod avant l'appel à l'API.
+   * dans le tableau, puis envoie à l'API (la validation est faite côté serveur).
    * @param event Événement de création de ng2-smart-table
    */
   public onCreateConfirm(event: any): void {
@@ -174,15 +174,15 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
 
     // 1. On récupère toutes les lignes actuelles de la table pour calculer le max(uid)
     this.source.getAll().then((currentData: any[]) => {
-      
-      const maxUid = currentData.length > 0 
-        ? Math.max(...currentData.map(item => item.uid ? Number(item.uid) : 0)) 
+
+      const maxUid = currentData.length > 0
+        ? Math.max(...currentData.map(item => item.uid ? Number(item.uid) : 0))
         : 0;
-      
+
       // Auto-incrémentation
       newData.uid = maxUid + 1;
 
-      // 2. Initialisation des champs masqués pour éviter que Zod ne bloque la validation
+      // 2. Initialisation des champs masqués non affichés dans le tableau
       // (Adaptez ces valeurs par défaut selon les contraintes de votre base de données)
       newData.waiting_time = 0;
       newData.menu_actif = 0;
@@ -196,28 +196,17 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
       newData.ch1_dissuasion = '';
       newData.barrage_entrant = 'Aucun';
 
-      // 3. Validation des données complétées avec votre schéma Zod
-      const result = OrangeAviProfileSchema.safeParse(newData);
+      this.oapService.addOap(newData as OrangeAviProfile).subscribe({
+        next: (res) => {
+          event.confirm.resolve(res);
+          this.profileStateService.notifyProfilesChanged();
+        },
+        error: (err) => {
+          console.error("Erreur lors de l'ajout du profil :", err);
+          event.confirm.reject();
+        }
+      });
 
-      if (result.success) {
-        const validProfile: OrangeAviProfile = result.data;
-
-        this.oapService.addOap(validProfile).subscribe({
-          next: (res) => {
-            event.confirm.resolve(res);
-            this.profileStateService.notifyProfilesChanged();
-          },
-          error: (err) => {
-            console.error("Erreur lors de l'ajout du profil :", err);
-            event.confirm.reject();
-          }
-        });
-      } else {
-        console.error("Erreurs de validation Zod :", result.error.format());
-        alert("Données invalides. Vérifiez la console pour les détails du schéma.");
-        event.confirm.reject();
-      }
-      
     }).catch(err => {
       console.error("Impossible de charger la source pour calculer l'UID", err);
       event.confirm.reject();
@@ -233,31 +222,21 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Intercepte et valide la modification d'un profil via le tableau.
+   * Intercepte la modification d'un profil via le tableau (la validation est faite côté serveur).
    * @param event Événement d'édition de ng2-smart-table
    */
   public onEditConfirm(event: any): void {
-    // Validation des nouvelles données avec Zod
-    const result = OrangeAviProfileSchema.safeParse(event.newData);
-
-    if (result.success) {
-      const validProfile: OrangeAviProfile = result.data;
-
-      this.oapService.updateOap(validProfile).subscribe({
-        next: (res) => {
-          event.confirm.resolve(res);
-          this.loadOrangeAviProfiles();
-          this.profileStateService.notifyProfilesChanged();
-        },
-        error: (err) => {
-          console.error("Erreur lors de la mise à jour du profil :", err);
-          event.confirm.reject();
-        }
-      });
-    } else {
-      console.error("Erreurs de validation Zod :", result.error.format());
-      event.confirm.reject();
-    }
+    this.oapService.updateOap(event.newData as OrangeAviProfile).subscribe({
+      next: (res) => {
+        event.confirm.resolve(res);
+        this.loadOrangeAviProfiles();
+        this.profileStateService.notifyProfilesChanged();
+      },
+      error: (err) => {
+        console.error("Erreur lors de la mise à jour du profil :", err);
+        event.confirm.reject();
+      }
+    });
   }
 
   /**
@@ -272,9 +251,9 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
     }
 
     // Plusieurs colonnes sont nullable en base (description, waiting_time, audio_*,
-    // type_dissuasion, ch1_dissuasion, menu_actif, barrage_entrant) mais le schéma Zod
-    // attend des chaînes/nombres non-null : on comble les null avant validation.
-    const dataToValidate = {
+    // type_dissuasion, ch1_dissuasion, menu_actif, barrage_entrant) : on comble les
+    // null avant l'envoi (la validation est faite côté serveur).
+    const dataToSave: OrangeAviProfile = {
       ...this.newSelectedProfile,
       profile: this.newSelectedProfile.profile.trim(),
       description: this.newSelectedProfile.description ?? '',
@@ -291,27 +270,20 @@ export class OrangeAviProfileComponent implements OnInit, OnDestroy {
       barrage_entrant: this.newSelectedProfile.barrage_entrant || 'Aucun',
     };
 
-    const result = OrangeAviProfileSchema.safeParse(dataToValidate);
-
-    if (result.success) {
-      this.oapService.updateOap(result.data).subscribe({
-        next: (updated) => {
-          this.isEditing = false;
-          this.isEditingProfileName = false;
-          this.selectedProfile = updated;
-          this.newSelectedProfile = { ...updated };
-          this.loadOrangeAviProfiles();
-          this.profileStateService.notifyProfilesChanged();
-        },
-        error: (err) => {
-          console.error("Erreur lors de la mise à jour du profil :", err);
-          alert("Erreur lors de la mise à jour du profil.");
-        }
-      });
-    } else {
-      console.error("Erreurs de validation Zod :", result.error.format());
-      alert("Données invalides. Vérifiez la console pour les détails du schéma.");
-    }
+    this.oapService.updateOap(dataToSave).subscribe({
+      next: (updated) => {
+        this.isEditing = false;
+        this.isEditingProfileName = false;
+        this.selectedProfile = updated;
+        this.newSelectedProfile = { ...updated };
+        this.loadOrangeAviProfiles();
+        this.profileStateService.notifyProfilesChanged();
+      },
+      error: (err) => {
+        console.error("Erreur lors de la mise à jour du profil :", err);
+        alert("Erreur lors de la mise à jour du profil.");
+      }
+    });
   }
 
   /**
